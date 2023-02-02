@@ -1,0 +1,82 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <!--<RuntimeIdentifier>cosmos</RuntimeIdentifier>-->
+        <Platform>cosmos</Platform>
+        <SupportsX86Intrinsics>false</SupportsX86Intrinsics>
+        <SelfContained>True</SelfContained>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <EnableGDB>False</EnableGDB>
+        <StartCosmosGDB>False</StartCosmosGDB>
+        <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
+        <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
+        <Launch>VMware</Launch>
+        <Profile>VMware</Profile>
+        <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+        <PxeInterface>192.168.0.8</PxeInterface>
+        <RemoveBootDebugOutput>True</RemoveBootDebugOutput>
+        <OptimizationLevel>2</OptimizationLevel>
+        <Timeout>5</Timeout>
+        <DebugEnabled>False</DebugEnabled>
+        <CompressionType>Gzip</CompressionType>
+        <CompileVBEMultiboot>False</CompileVBEMultiboot>
+        <VBEResolution>800x600x32</VBEResolution>
+        <BootloaderResolution>640x480x32</BootloaderResolution>
+        <BinFormat>Elf</BinFormat>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="Art\Icons\clock.bmp" />
+      <None Remove="Art\Icons\close_window.bmp" />
+      <None Remove="Art\Icons\mouse.bmp" />
+      <None Remove="Art\Icons\notepad.bmp" />
+      <None Remove="Art\Icons\OS_Logo.bmp" />
+      <None Remove="Art\Icons\OS_Menu.bmp" />
+      <None Remove="Art\Icons\PowerOff.bmp" />
+      <None Remove="Art\Icons\Restart.bmp" />
+      <None Remove="Art\Icons\ReturnToConsole.bmp" />
+      <None Remove="Art\Icons\terminal.bmp" />
+      <None Remove="Art\Icons\xp_arrow.bmp" />
+      <None Remove="Art\Icons\xp_link.bmp" />
+      <None Remove="Art\Icons\xp_move.bmp" />
+      <None Remove="Art\Icons\xp_pencil.bmp" />
+      <None Remove="Art\Wallpapers\BG_1280x1024.bmp" />
+      <None Remove="Art\Wallpapers\BG_1920x1080.bmp" />
+      <None Remove="Art\Wallpapers\PowerGradient.bmp" />
+      <None Remove="Audio\BootSound.wav" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Art\Icons\clock.bmp" />
+      <EmbeddedResource Include="Art\Icons\close_window.bmp" />
+      <EmbeddedResource Include="Art\Icons\mouse.bmp" />
+      <EmbeddedResource Include="Art\Icons\notepad.bmp" />
+      <EmbeddedResource Include="Art\Icons\OS_Logo.bmp" />
+      <EmbeddedResource Include="Art\Icons\OS_Menu.bmp" />
+      <EmbeddedResource Include="Art\Icons\PowerOff.bmp" />
+      <EmbeddedResource Include="Art\Icons\Restart.bmp" />
+      <EmbeddedResource Include="Art\Icons\ReturnToConsole.bmp" />
+      <EmbeddedResource Include="Art\Icons\terminal.bmp" />
+      <EmbeddedResource Include="Art\Icons\xp_arrow.bmp" />
+      <EmbeddedResource Include="Art\Icons\xp_link.bmp" />
+      <EmbeddedResource Include="Art\Icons\xp_move.bmp" />
+      <EmbeddedResource Include="Art\Icons\xp_pencil.bmp" />
+      <EmbeddedResource Include="Art\Wallpapers\BG_1280x1024.bmp" />
+      <EmbeddedResource Include="Art\Wallpapers\PowerGradient.bmp" />
+      <EmbeddedResource Include="Audio\BootSound.wav" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Cosmos.Build" Version="0-*" NoWarn="NU1604" />
+        <PackageReference Include="Cosmos.Debug.Kernel" Version="0-*" NoWarn="NU1604" />
+        <PackageReference Include="Cosmos.System2" Version="0-*" NoWarn="NU1604" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Art\Screenshots\" />
+    </ItemGroup>
+
+</Project>

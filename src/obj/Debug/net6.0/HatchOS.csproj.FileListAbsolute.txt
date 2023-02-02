@@ -1,0 +1,24 @@
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/bin/Debug/net6.0/HatchOS.deps.json
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/bin/Debug/net6.0/HatchOS.dll
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/bin/Debug/net6.0/HatchOS.pdb
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/obj/Debug/net6.0/HatchOS.csproj.AssemblyReference.cache
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/obj/Debug/net6.0/HatchOS.GeneratedMSBuildEditorConfig.editorconfig
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/obj/Debug/net6.0/HatchOS.AssemblyInfoInputs.cache
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/obj/Debug/net6.0/HatchOS.AssemblyInfo.cs
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/obj/Debug/net6.0/HatchOS.csproj.CoreCompileInputs.cache
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/obj/Debug/net6.0/HatchOS.dll
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/obj/Debug/net6.0/refint/HatchOS.dll
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/obj/Debug/net6.0/HatchOS.pdb
+/media/andrew/Samsung USB/Programming/C#/HatchOS/HatchOS/obj/Debug/net6.0/ref/HatchOS.dll
+D:\Programming\C#\HatchOS\HatchOS\bin\Debug\net6.0\HatchOS.deps.json
+D:\Programming\C#\HatchOS\HatchOS\bin\Debug\net6.0\HatchOS.dll
+D:\Programming\C#\HatchOS\HatchOS\bin\Debug\net6.0\HatchOS.pdb
+D:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.csproj.AssemblyReference.cache
+D:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.GeneratedMSBuildEditorConfig.editorconfig
+D:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.AssemblyInfoInputs.cache
+D:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.AssemblyInfo.cs
+D:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.csproj.CoreCompileInputs.cache
+D:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.dll
+D:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\refint\HatchOS.dll
+D:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.pdb
+D:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\ref\HatchOS.dll
