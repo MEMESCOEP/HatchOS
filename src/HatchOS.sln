@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HatchOS", "HatchOS\HatchOS.csproj", "{FF4ACFDA-EE18-4B6D-A46B-7884A082CB16}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF4ACFDA-EE18-4B6D-A46B-7884A082CB16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF4ACFDA-EE18-4B6D-A46B-7884A082CB16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF4ACFDA-EE18-4B6D-A46B-7884A082CB16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF4ACFDA-EE18-4B6D-A46B-7884A082CB16}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1C5B73C3-91B4-4FD5-BD54-551429C195AE}
+	EndGlobalSection
+EndGlobal
