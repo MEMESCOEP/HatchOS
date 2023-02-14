@@ -1,8 +1,6 @@
 ### HatchOS Build Script ###
 # Imports
 import subprocess as sp
-from tkinter import *
-from tkinter import messagebox
 
 # Build code
 rc = sp.call("dotnet build")
