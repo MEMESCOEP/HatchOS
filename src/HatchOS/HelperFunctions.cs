@@ -1,10 +1,8 @@
 ﻿/* DIRECTIVES */
 using Cosmos.HAL;
-using Cosmos.System.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Security.Cryptography;
+using System.Collections.Generic;
 
 /* NAMESPACES */
 namespace HatchOS
@@ -27,7 +25,7 @@ namespace HatchOS
         }
 
         // Change the mouse cursor image
-        public static void ChangeMouseCursor(Bitmap NewImage)
+        public static void ChangeMouseCursor(PrismGraphics.Image NewImage)
         {
             Kernel.Mouse = NewImage;
         }
@@ -62,7 +60,7 @@ namespace HatchOS
         // Get the distance between two points
         public static double GetPointDistance(Point p1, Point p2)
         {
-            return Math.Sqrt(Math.Pow((p2.X - p1.X), 2) + Math.Pow((p2.Y - p1.Y), 2));
+            return Math.Sqrt(Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2));
         }
 
         // Get the difference between two numbers
@@ -84,6 +82,56 @@ namespace HatchOS
         {
             Console.WriteLine(message);
             SerialPort.SendString(message + "\n", SerialPort.COM1);
+        }
+
+        // Display a message in console mode and send the same message over serial
+        public static void DisplayConsoleMsg(string message)
+        {
+            Console.WriteLine(message);
+            SerialPort.SendString(message + "\n", SerialPort.COM1);
+        }
+
+        // Add a byte to a byte array
+        public static byte[] AddByteToArray(byte[] bArray, byte newByte)
+        {
+            byte[] newArray = new byte[bArray.Length + 1];
+            bArray.CopyTo(newArray, 1);
+            newArray[0] = newByte;
+            return newArray;
+        }
+
+        // Remove the last character from a string
+        public static string TrimLastCharacter(string str)
+        {
+            if(!string.IsNullOrEmpty(str))
+            {
+                return str.TrimEnd(str[str.Length - 1]);
+            }
+            return null;
+        }
+
+        // Remove the last n characters from a string
+        public static string RemoveCharsFromEnd(string str, int CharNum)
+        {
+            if (!string.IsNullOrEmpty(str))
+            {
+                return str.Substring(0, str.Length - CharNum);
+            }
+            return null;
+        }
+
+        // Find the number of times a char occurs in a string
+        public static int StringContainsCharNTimes(string StrToTest, char CharToTest)
+        {
+            int Count = 0;
+            foreach(char c in StrToTest)
+            {
+                if(c == CharToTest)
+                {
+                    Count++;
+                }
+            }
+            return Count;
         }
     }
 }

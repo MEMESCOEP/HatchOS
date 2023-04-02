@@ -1,8 +1,6 @@
 ﻿/* DIRECTIVES */
 using Cosmos.HAL;
-using Cosmos.System.Graphics.Fonts;
 using System;
-using System.Drawing;
 using static HatchOS.HelperFunctions;
 
 /* NAMESPACES */
@@ -28,17 +26,17 @@ namespace HatchOS
             // Draw the panic screen
             try
             {
-                Kernel.canvas.Clear(Color.Red);
-                Kernel.canvas.DrawString("[===== KERNEL PANIC =====]", PCScreenFont.Default, Color.Black, 0, 0);
-                Kernel.canvas.DrawString("CODE: " + ErrCode, PCScreenFont.Default, Color.Black, 0, 16);
-                Kernel.canvas.DrawString("MESSAGE: " + Message, PCScreenFont.Default, Color.Black, 0, 32);
-                Kernel.canvas.DrawString("<PRESS ANY KEY TO REBOOT>", PCScreenFont.Default, Color.Black, 0, Kernel.ScreenHeight - 16);
-                Kernel.canvas.Display();
+                Kernel.canvas.Clear(PrismGraphics.Color.Red);
+                Kernel.canvas.DrawString(0, 0, "[===== KERNEL PANIC =====]", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
+                Kernel.canvas.DrawString(0, 16, "CODE: " + ErrCode, PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
+                Kernel.canvas.DrawString(0, 32, "MESSAGE: " + Message, PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
+                Kernel.canvas.DrawString(0, Kernel.ScreenHeight - 16, "<PRESS ANY KEY TO REBOOT>", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
+                Kernel.canvas.Update();
 
                 Console.ReadKey();
-                Kernel.canvas.Clear(Color.Black);
-                Kernel.canvas.DrawString("REBOOTING...", PCScreenFont.Default, Color.White, 0, 0);
-                Kernel.canvas.Display();
+                Kernel.canvas.Clear(PrismGraphics.Color.Black);
+                Kernel.canvas.DrawString(0, 0, "REBOOTING...", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+                Kernel.canvas.Update();
                 PowerFunctions.Restart();
             }
             catch(Exception EX2)

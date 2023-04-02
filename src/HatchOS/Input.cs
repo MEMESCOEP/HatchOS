@@ -1,12 +1,13 @@
 ﻿/* DIRECTIVES */
 using System;
 using Cosmos.System;
+using System.Text;
 using System.Drawing;
 using System.Collections.Generic;
-using static HatchOS.HelperFunctions;
-using static HatchOS.PowerFunctions;
 using Cosmos.HAL;
 using Cosmos.Core;
+using static HatchOS.HelperFunctions;
+using static HatchOS.PowerFunctions;
 
 /* NAMESPACES */
 namespace HatchOS
@@ -16,31 +17,33 @@ namespace HatchOS
     {
         /* VARIABLES */
         public static uint MouseChange = 10;
+        public static StringBuilder KeybBuffer = new StringBuilder(31);
+        public static string ActiveTerminalLine;
 
         /* FUNCTIONS */
         // Handle keyboard / mouse input
         public static void HandleInput()
         {
             // Update the mouse values
-            Kernel.MouseX = (Math.Clamp(MouseManager.X, 0, (uint)Kernel.ScreenWidth - Kernel.Mouse.Width));
-            Kernel.MouseY = (Math.Clamp(MouseManager.Y, 0, (uint)Kernel.ScreenHeight - Kernel.Mouse.Height));
+            Kernel.MouseX = Math.Clamp(MouseManager.X, 0, (uint)Kernel.ScreenWidth - Kernel.Mouse.Width);
+            Kernel.MouseY = Math.Clamp(MouseManager.Y, 0, (uint)Kernel.ScreenHeight - Kernel.Mouse.Height);
 
             // Test if the mouse has been moved
-            //Kernel.MouseMoved = !(Kernel.OldMouseX == Kernel.MouseX && Kernel.OldMouseY == Kernel.MouseY);
+            Kernel.MouseMoved = !(Kernel.OldMouseX == Kernel.MouseX && Kernel.OldMouseY == Kernel.MouseY);
 
             // Try to read a key from the keyboard
             KeyboardManager.TryReadKey(out var key);
+
+            if(key != null)
+            {
+                KeybBuffer.Append(key.KeyChar);
+                //KeybBuffer += key.KeyChar;
+            }
 
             // If one of the Windows keys are pressed, toggle the menu
             if (key.Key == ConsoleKeyEx.LWin || key.Key == ConsoleKeyEx.RWin)
             {
                 Kernel.ShowMenu = !Kernel.ShowMenu;
-            }
-
-            // If the F11 key is pressed, change the task bar color to a random ARGB color
-            if (key.Key == ConsoleKeyEx.F11)
-            {
-                Kernel.TaskBarColor = Color.FromArgb(Kernel.random.Next(256), Kernel.random.Next(256), Kernel.random.Next(256));
             }
 
             // If the F12 key is pressed, toggle debug info
@@ -91,19 +94,31 @@ namespace HatchOS
             // Create a new debug window when the F8 key is pressed
             if (key.Key == ConsoleKeyEx.F8)
             {
-                WindowManager.CreateNewWindow(Kernel.WindowList, new Point(64, 64), new Point(300, 200), new List<Color> { Color.DarkSlateGray, Color.DimGray, Color.Black, Color.FromArgb(255, 40, 65, 65) }, $"TEST WINDOW {Kernel.WindowList.Count}");
+                WindowManager.CreateNewWindow(Kernel.WindowList, new Point(64, 64), new Point(300, 200), new List<PrismGraphics.Color> { PrismGraphics.Color.GetPacked(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B), PrismGraphics.Color.LightGray, PrismGraphics.Color.Black, PrismGraphics.Color.GetPacked(255, 40, 65, 65) }, "TEST WINDOW " + Kernel.WindowList.Count);
+            }
+
+            // Interpret a sample batch script
+            if (key.Key == ConsoleKeyEx.F9)
+            {
+                BatchInterpreter.InterpretBatchScript("SET A=0\nmsgbox(\"bruh\", \"amoGnUS!!!111!1111!!11\")");
+            }
+
+            // Create a terminal
+            if (key.Key == ConsoleKeyEx.F10)
+            {
+                WindowManager.CreateNewWindow(Kernel.WindowList, new Point(64, 64), new Point(200, 120), new List<PrismGraphics.Color> { PrismGraphics.Color.DeepGray, PrismGraphics.Color.Black, PrismGraphics.Color.Black, PrismGraphics.Color.GetPacked(255, 40, 65, 65) }, "TERMINAL");
+                WindowElement TerminalText = new WindowElement();
+                TerminalText.ElementType = "StringElement";
+                TerminalText.ElementData = ">> _";
+                TerminalText.ElementColor = PrismGraphics.Color.White;
+                TerminalText.ElementPosition = new Point(0, 0);
+                Kernel.ActiveWindow.WindowElements.Add(TerminalText);
             }
 
             // Toggle the power menu when the escape key is pressed
-            if (key.Key== ConsoleKeyEx.Escape)
+            if (key.Key == ConsoleKeyEx.Escape)
             {
                 PowerOff(Kernel.canvas, "-sr");
-            }
-
-            // Disable the canvas when the end key is pressed
-            if(key.Key == ConsoleKeyEx.End)
-            {
-                Kernel.canvas.Disable();
             }
 
             // If the mouse is over the menu icon and the left button is pressed, toggle the menu
@@ -136,6 +151,59 @@ namespace HatchOS
             else
             {
                 ChangeMouseCursor(Kernel.MouseNormal);
+            }
+
+            // If the active window is the terminal, send input to it
+            if (Kernel.ActiveWindow != null && Kernel.ActiveWindow.WindowTitle == "TERMINAL" && key != null)
+            {
+                if (key.Key == ConsoleKeyEx.Backspace && Kernel.ActiveWindow.WindowElements[0].ElementData.Length > 4)
+                {
+                    Kernel.ActiveWindow.WindowElements[0].ElementData = RemoveCharsFromEnd(Kernel.ActiveWindow.WindowElements[0].ElementData, 2) + "_";
+                    ActiveTerminalLine = TrimLastCharacter(ActiveTerminalLine);
+                    KeybBuffer.Remove(KeybBuffer[KeybBuffer.Length - 1], 1);
+                }
+
+                else if(char.IsLetterOrDigit(key.KeyChar) || char.IsPunctuation(key.KeyChar) || key.KeyChar == ' ')
+                {                    
+                    if (ActiveTerminalLine.Length < 21)
+                    {
+                        ActiveTerminalLine += KeybBuffer[KeybBuffer.Length - 1].ToString();
+                        Kernel.ActiveWindow.WindowElements[0].ElementData = TrimLastCharacter(Kernel.ActiveWindow.WindowElements[0].ElementData) + KeybBuffer[KeybBuffer.Length - 1].ToString() + "_";
+                    }
+                }
+
+                else
+                {
+                    if(key.Key == ConsoleKeyEx.Enter)
+                    {
+                        bool UseNullCharacter = true;
+                        Kernel.ActiveWindow.WindowElements[0].ElementData = TrimLastCharacter(Kernel.ActiveWindow.WindowElements[0].ElementData);
+
+                        if (StringContainsCharNTimes(Kernel.ActiveWindow.WindowElements[0].ElementData, '\0') > 2)
+                        {
+                            Kernel.ActiveWindow.WindowElements[0].ElementData = null;
+                            UseNullCharacter = false;
+                        }
+
+                        if (ActiveTerminalLine.ToLower() == "exit")
+                        {
+                            Kernel.ActiveWindow.CloseWindow();
+                            ActiveTerminalLine = "";
+                        }
+                        else
+                        {
+                            Kernel.ActiveWindow.WindowElements[0].ElementData += "\0Invalid command!";
+                            if (!UseNullCharacter)
+                            {
+                                Kernel.ActiveWindow.WindowElements[0].ElementData = Kernel.ActiveWindow.WindowElements[0].ElementData.Substring(1, Kernel.ActiveWindow.WindowElements[0].ElementData.Length - 1);
+                            }
+
+                        }
+
+                        Kernel.ActiveWindow.WindowElements[0].ElementData += "\0>> _";
+                        ActiveTerminalLine = "";
+                    }
+                }
             }
         }
     }

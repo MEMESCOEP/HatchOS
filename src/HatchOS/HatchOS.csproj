@@ -22,7 +22,7 @@
         <Timeout>5</Timeout>
         <DebugEnabled>False</DebugEnabled>
         <CompressionType>Gzip</CompressionType>
-        <CompileVBEMultiboot>True</CompileVBEMultiboot>
+        <CompileVBEMultiboot>False</CompileVBEMultiboot>
         <VBEResolution>1024x768x32</VBEResolution>
         <BootloaderResolution>640x480x32</BootloaderResolution>
         <BinFormat>Elf</BinFormat>
@@ -62,9 +62,19 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Include="..\.editorconfig" Link=".editorconfig" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Cosmos.Build" Version="0-*" NoWarn="NU1604" />
         <PackageReference Include="Cosmos.Debug.Kernel" Version="0-*" NoWarn="NU1604" />
         <PackageReference Include="Cosmos.System2" Version="0-*" NoWarn="NU1604" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="PrismGraphics">
+        <HintPath>Libraries\PrismGraphics.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

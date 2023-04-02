@@ -1,0 +1,14 @@
+F:\Programming\C#\HatchOS\HatchOS\bin\Debug\net6.0\HatchOS.deps.json
+F:\Programming\C#\HatchOS\HatchOS\bin\Debug\net6.0\HatchOS.dll
+F:\Programming\C#\HatchOS\HatchOS\bin\Debug\net6.0\HatchOS.pdb
+F:\Programming\C#\HatchOS\HatchOS\bin\Debug\net6.0\PrismGraphics.dll
+F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.csproj.AssemblyReference.cache
+F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.GeneratedMSBuildEditorConfig.editorconfig
+F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.AssemblyInfoInputs.cache
+F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.AssemblyInfo.cs
+F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.csproj.CoreCompileInputs.cache
+F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.csproj.CopyComplete
+F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.dll
+F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\refint\HatchOS.dll
+F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.pdb
+F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\ref\HatchOS.dll
