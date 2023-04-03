@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "KbNc4g+MZfSjGj+fMJaL/ZOcMAxvZlMLXJznG0z8/dJDKKvuvUKtTnPFeAvxHEz78/z3MWtqWeDN6CBbcOuCMA==",
+  "dgSpecHash": "wwXwdSMQbtiw3xJ1C0wJKKssGJfK0Grm1pw5st+b0kQWcpf2QRH/6cEmy1DZEfd0os0nvCJJb4LlEUBi5dojwA==",
   "success": true,
-  "projectFilePath": "F:\\Programming\\C#\\HatchOS\\HatchOS\\HatchOS.csproj",
+  "projectFilePath": "C:\\Users\\andre\\Documents\\GitHub\\HatchOS\\src\\HatchOS\\HatchOS.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\andre\\.nuget\\packages\\cosmos.build\\0.1.0-localbuild20230402021856\\cosmos.build.0.1.0-localbuild20230402021856.nupkg.sha512",
     "C:\\Users\\andre\\.nuget\\packages\\cosmos.common\\0.1.0-localbuild20230402021912\\cosmos.common.0.1.0-localbuild20230402021912.nupkg.sha512",

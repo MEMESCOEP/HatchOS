@@ -8,6 +8,7 @@ using Cosmos.HAL;
 using Cosmos.Core;
 using static HatchOS.HelperFunctions;
 using static HatchOS.PowerFunctions;
+using System.Diagnostics;
 
 /* NAMESPACES */
 namespace HatchOS
@@ -19,6 +20,7 @@ namespace HatchOS
         public static uint MouseChange = 10;
         public static StringBuilder KeybBuffer = new StringBuilder(31);
         public static string ActiveTerminalLine;
+        public static int PromptLength = 4;
 
         /* FUNCTIONS */
         // Handle keyboard / mouse input
@@ -30,6 +32,9 @@ namespace HatchOS
 
             // Test if the mouse has been moved
             Kernel.MouseMoved = !(Kernel.OldMouseX == Kernel.MouseX && Kernel.OldMouseY == Kernel.MouseY);
+
+            //Kernel.OldMouseX = Kernel.MouseX;
+            //Kernel.OldMouseY = Kernel.MouseY;
 
             // Try to read a key from the keyboard
             KeyboardManager.TryReadKey(out var key);
@@ -106,7 +111,7 @@ namespace HatchOS
             // Create a terminal
             if (key.Key == ConsoleKeyEx.F10)
             {
-                WindowManager.CreateNewWindow(Kernel.WindowList, new Point(64, 64), new Point(200, 120), new List<PrismGraphics.Color> { PrismGraphics.Color.DeepGray, PrismGraphics.Color.Black, PrismGraphics.Color.Black, PrismGraphics.Color.GetPacked(255, 40, 65, 65) }, "TERMINAL");
+                WindowManager.CreateNewWindow(Kernel.WindowList, new Point(64, 64), new Point(200, 120), new List<PrismGraphics.Color> { PrismGraphics.Color.GetPacked(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B), PrismGraphics.Color.Black, PrismGraphics.Color.Black, PrismGraphics.Color.GetPacked(255, 40, 65, 65) }, "TERMINAL");
                 WindowElement TerminalText = new WindowElement();
                 TerminalText.ElementType = "StringElement";
                 TerminalText.ElementData = ">> _";
@@ -156,7 +161,7 @@ namespace HatchOS
             // If the active window is the terminal, send input to it
             if (Kernel.ActiveWindow != null && Kernel.ActiveWindow.WindowTitle == "TERMINAL" && key != null)
             {
-                if (key.Key == ConsoleKeyEx.Backspace && Kernel.ActiveWindow.WindowElements[0].ElementData.Length > 4)
+                if (key.Key == ConsoleKeyEx.Backspace && Kernel.ActiveWindow.WindowElements[0].ElementData.Length > PromptLength)
                 {
                     Kernel.ActiveWindow.WindowElements[0].ElementData = RemoveCharsFromEnd(Kernel.ActiveWindow.WindowElements[0].ElementData, 2) + "_";
                     ActiveTerminalLine = TrimLastCharacter(ActiveTerminalLine);
@@ -182,6 +187,7 @@ namespace HatchOS
                         if (StringContainsCharNTimes(Kernel.ActiveWindow.WindowElements[0].ElementData, '\0') > 2)
                         {
                             Kernel.ActiveWindow.WindowElements[0].ElementData = null;
+                            PromptLength = 4;
                             UseNullCharacter = false;
                         }
 
@@ -201,6 +207,7 @@ namespace HatchOS
                         }
 
                         Kernel.ActiveWindow.WindowElements[0].ElementData += "\0>> _";
+                        PromptLength = Kernel.ActiveWindow.WindowElements[0].ElementData.Length;
                         ActiveTerminalLine = "";
                     }
                 }

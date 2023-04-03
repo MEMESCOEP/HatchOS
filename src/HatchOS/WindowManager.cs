@@ -21,7 +21,7 @@ namespace HatchOS
             Kernel.ActiveWindow = window;
             WindowList.Add(window);
             MoveListItemToIndex(WindowList, WindowList.IndexOf(window), WindowList.Count);
-            DisplayConsoleMsg($"[INFO] >> Created window \"{Title}\" with dimensions {Size.X}x{Size.Y}");
+            DisplayConsoleMsg("[INFO] >> Created window \"" + Title + "\" with dimensions " + Size.X + "x" + Size.Y);
         }
     }
 }

@@ -549,11 +549,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\Programming\\C#\\HatchOS\\HatchOS\\HatchOS.csproj",
+      "projectUniqueName": "C:\\Users\\andre\\Documents\\GitHub\\HatchOS\\src\\HatchOS\\HatchOS.csproj",
       "projectName": "HatchOS",
-      "projectPath": "F:\\Programming\\C#\\HatchOS\\HatchOS\\HatchOS.csproj",
+      "projectPath": "C:\\Users\\andre\\Documents\\GitHub\\HatchOS\\src\\HatchOS\\HatchOS.csproj",
       "packagesPath": "C:\\Users\\andre\\.nuget\\packages\\",
-      "outputPath": "F:\\Programming\\C#\\HatchOS\\HatchOS\\obj\\",
+      "outputPath": "C:\\Users\\andre\\Documents\\GitHub\\HatchOS\\src\\HatchOS\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Users\\andre\\AppData\\Roaming\\Godot\\mono\\GodotNuGetFallbackFolder"

@@ -12,3 +12,17 @@ F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.dll
 F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\refint\HatchOS.dll
 F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\HatchOS.pdb
 F:\Programming\C#\HatchOS\HatchOS\obj\Debug\net6.0\ref\HatchOS.dll
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\bin\Debug\net6.0\HatchOS.deps.json
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\bin\Debug\net6.0\HatchOS.dll
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\bin\Debug\net6.0\HatchOS.pdb
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\bin\Debug\net6.0\PrismGraphics.dll
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\obj\Debug\net6.0\HatchOS.csproj.AssemblyReference.cache
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\obj\Debug\net6.0\HatchOS.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\obj\Debug\net6.0\HatchOS.AssemblyInfoInputs.cache
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\obj\Debug\net6.0\HatchOS.AssemblyInfo.cs
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\obj\Debug\net6.0\HatchOS.csproj.CoreCompileInputs.cache
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\obj\Debug\net6.0\HatchOS.csproj.CopyComplete
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\obj\Debug\net6.0\HatchOS.dll
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\obj\Debug\net6.0\refint\HatchOS.dll
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\obj\Debug\net6.0\HatchOS.pdb
+C:\Users\andre\Documents\GitHub\HatchOS\src\HatchOS\obj\Debug\net6.0\ref\HatchOS.dll
