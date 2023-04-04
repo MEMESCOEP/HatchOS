@@ -103,6 +103,8 @@ namespace HatchOS
         public static int ColorG = 0;
         public static int ColorB = 0;
         public static int GCCount = 0;
+        int offsetX;
+        int offsetY;
         /*public static int RTCDay;
         public static int RTCMonth;
         public static int RTCYear;*/
@@ -114,8 +116,8 @@ namespace HatchOS
         // Executed once upon system startup
         protected override void BeforeRun()
         {
-            System.Console.Write("Starting HatchOS...");
-
+            // Check to make sure there is enough ram to run HatchOS
+            DisplayConsoleMsg("[INFO] >> Checking memory requirements...");
             if (CPU.GetAmountOfRAM() + 2 <= 107)
             {
                 System.Console.WriteLine("\n[ERROR] Not enough RAM for HatchOS to run!");
@@ -130,6 +132,7 @@ namespace HatchOS
             }
 
             // Assign bitmaps (using embedded resources)
+            DisplayConsoleMsg("[INFO] >> Assigning variables...");
             PowerGradientBG = Image.FromBitmap(PowerGradientData);
             CloseWindow = Image.FromBitmap(CloseWindowData);
             MouseNormal = Image.FromBitmap(MouseNormalData);
@@ -148,6 +151,7 @@ namespace HatchOS
             AvailableRam = (uint)GCImplementation.GetAvailableRAM() * 1024;
 
             // If we aren't running in VMWare, print a warning, wait for the user to press a key
+            DisplayConsoleMsg("[INFO] >> Testing for VMSVGAII...");
             if (!VMTools.IsVMWare)
             {
                 System.Console.WriteLine("\n[WARN] HatchOS is running outside of VMWare.");
@@ -170,6 +174,7 @@ namespace HatchOS
             }
 
             // Attempt to create a canvas with the specified width and height
+            DisplayConsoleMsg("[INFO] >> Creating a canvas...");
             try
             {
                 canvas = new((ushort)ScreenWidth, (ushort)ScreenHeight);
@@ -248,6 +253,8 @@ namespace HatchOS
                 }
                 DisplayConsoleError($"[ERROR] Failed to play the audio file! {ex.Message}");
             }
+            
+            System.Console.Write("Starting HatchOS...");
         }
 
         // Executed every frame after BeforeRun() is finished running
@@ -330,13 +337,12 @@ namespace HatchOS
                 // Since we're using a double-buffered driver, we need to copy the second (non-visible) framebuffer
                 // into the first (visible) framebuffer. This ensures that there is no flickering or screen tearing,
                 // and makes sure the graphics are visible to the user.
-                //if(MouseMoved)
                 canvas.Update();
 
                 // Handle keyboard/mouse input
                 Input.HandleInput();
 
-                // Call the garbage collector so we don't have as many memory leaks. This also helps improve framerates.
+                // Call the garbage collector so we don't have as many memory leaks. This also helps improve framerates in some cases.
                 Heap.Collect();
             }
             catch
@@ -372,7 +378,7 @@ namespace HatchOS
             // Display loop
             while (true)
             {
-                // Attempt to draw (for stability reasons 🤓)
+                // Attempt to draw (for stability reasons lol 🤓)
                 try
                 {
                     // Draw the screen
@@ -389,8 +395,8 @@ namespace HatchOS
                             ChangeMouseCursor(MouseMove);
 
                             // Get the correct offset values for the X and Y coordinates
-                            int offsetX = (int)FindDifference(window.WindowLocation.X, MouseX);
-                            int offsetY = (int)FindDifference(window.WindowLocation.Y, MouseY);
+                            offsetX = (int)FindDifference(window.WindowLocation.X, MouseX);
+                            offsetY = (int)FindDifference(window.WindowLocation.Y, MouseY);
 
                             // While the mouse's left button is pressed, move the window to the mouse's position (with the correct offsets)
                             // and draw the screen
@@ -445,7 +451,7 @@ namespace HatchOS
                 }
                 catch(Exception ex)
                 {
-                    // If we encountered an error, panic and hang
+                    // If we encountered an error, panic
                     KernelPanic.Panic(ex.Message, ex.HResult.ToString());
                 }
             }
