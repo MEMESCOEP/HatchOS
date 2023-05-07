@@ -10,7 +10,7 @@ machine = vbox.find_machine("HatchOS")
 ### MAIN CODE ###
 progress = machine.launch_vm_process(session, "gui", [])
 time.sleep(10)
-subprocess.call("C:\\Program Files\\PuTTY\\plink.exe -serial \\\\.\\pipe\\HatchOS")
+subprocess.call("plink -serial \\\\.\\pipe\\HatchOS")
 progress.wait_for_completion()
 
         
