@@ -10,15 +10,16 @@ using System.Threading;
 using System.Collections.Generic;
 using Cosmos.HAL;
 using Cosmos.Core;
-using Cosmos.System;
 using Cosmos.Core.Memory;
+using Cosmos.System;
 using Sys = Cosmos.System;
-using Cosmos.System.Audio;
-using Cosmos.System.Audio.IO;
-using Cosmos.HAL.Drivers.PCI.Audio;
-using Cosmos.System.Audio.DSP.Processing;
+using Cosmos.System.FileSystem.VFS;
+using Cosmos.System.Network.Config;
+using Cosmos.System.Network.IPv4.UDP.DHCP;
+using Cosmos.HAL.Drivers.Audio;
 using IL2CPU.API.Attribs;
 using PrismGraphics;
+using PrismGraphics.Extentions;
 using static HatchOS.HelperFunctions;
 
 /* NAMESPACES */
@@ -47,44 +48,61 @@ namespace HatchOS
         [ManifestResourceStream(ResourceName = "HatchOS.Resources.close_window.bmp")]
         static byte[] CloseWindowData;
 
-        [ManifestResourceStream(ResourceName = "HatchOS.Resources.BootSound.wav")]
-        static byte[] BootSoundAudio;
-
         [ManifestResourceStream(ResourceName = "HatchOS.Resources.PowerGradient.bmp")]
         static byte[] PowerGradientData;
 
+        [ManifestResourceStream(ResourceName = "HatchOS.Resources.BootSound.wav")]
+        static byte[] BootSoundAudio;
+
+        [ManifestResourceStream(ResourceName = "HatchOS.Resources.shutdown.wav")]
+        public static byte[] ShutdownAudio;
+
         // Canvas
-        public static PrismGraphics.Extentions.VMWare.SVGAIICanvas canvas;
+        public static Display canvas;
+
+        // Points
+        public static Point TimePoint;
+        public static Point DatePoint;
+        public static Point LogoPoint;
+
+        // Virtual file system(s)
+        public static Sys.FileSystem.CosmosVFS vfs;
 
         // Bitmaps
-        public static Image Wallpaper;
-        public static Image Mouse;
-        public static Image MouseNormal;
-        public static Image MouseLink;
-        public static Image MouseMove;
-        public static Image OSLogo;
-        public static Image CloseWindow;
-        public static Image PowerGradientBG;
+        public static Graphics Wallpaper;
+        public static Graphics Mouse;
+        public static Graphics MouseNormal;
+        public static Graphics MouseLink;
+        public static Graphics MouseMove;
+        public static Graphics OSLogo;
+        public static Graphics CloseWindow;
+        public static Graphics PowerGradientBG;
 
         // Color(s)
         public static PrismGraphics.Color TaskBarColor;
         public static PrismGraphics.Color LoadingColor;
+        public static PrismGraphics.Color StartButtonColor;
+        public static PrismGraphics.Color StartButtonColorPressed;
 
-        // Audio mixer(s)
-        public static AudioMixer mixer = new AudioMixer();
+        // Gradient(s)
+        public static Graphics TaskBarGradient;
 
         // Booleans
         public static bool ShowMenu = false;
-        public static bool Debug = true;
+        public static bool Debug = false;
         public static bool Booted = false;
         public static bool MouseMoved = false;
-        private static bool EnableBootScreen = false;
+        private static bool EnableBootScreen = true;
+        public static bool AudioEnabled = false;
+
+        // Audio driver(s)
+        public static AudioDriver audioDriver;
 
         // Unsigned integers
         public static uint MouseX, MouseY, BootTimer, LoadPos = 160, OldMouseX, OldMouseY, AvailableRam;
 
         // Floating point numbers
-        public static float AudioVolume = 0.25f; // Max value should be 1f (or 100 percent volume; values range from 0f to 1f)
+        public static float AudioVolume = 1f; // Max value should be 1f (or 100 percent volume. Values range from 0f to 1f, which means 0 - 100 percent.)
 
         // Random
         public static Random random = new Random();
@@ -93,21 +111,24 @@ namespace HatchOS
         public static Timer HeapCollectionTimer; // = new PIT.PITTimer(TimerCallback, MillisecondsToNanoseconds(250), true);
 
         // Lists
-        public static List<Window> WindowList = new List<Window>();
+        public static List<Window> WindowList = new();
+        public static List<Point> LogoHighlightPoints = new();
 
         // Integers
-        public static int ScreenWidth = 1024;
-        public static int ScreenHeight = 768;
+        public static int ScreenWidth = 800;
+        public static int ScreenHeight = 600;
         public static int LoadPosSegment = ScreenWidth / 5;
         public static int ColorR = 0;
         public static int ColorG = 0;
         public static int ColorB = 0;
         public static int GCCount = 0;
-        int offsetX;
-        int offsetY;
-        /*public static int RTCDay;
-        public static int RTCMonth;
-        public static int RTCYear;*/
+        public static int FrameCount = 0;
+        public static int offsetX = 0;
+        public static int offsetY = 0;
+
+        // String(s)
+        public static string CPUName;
+        public static string VersionString = "P_5-7-23 (1719)";
 
         // Window(s)
         public static Window ActiveWindow;
@@ -116,85 +137,36 @@ namespace HatchOS
         // Executed once upon system startup
         protected override void BeforeRun()
         {
+            DisplayConsoleMsg($"[INFO] >> HatchOS {VersionString} is starting...");
+
             // Check to make sure there is enough ram to run HatchOS
             DisplayConsoleMsg("[INFO] >> Checking memory requirements...");
-            if (CPU.GetAmountOfRAM() + 2 <= 107)
+            if (CPU.GetAmountOfRAM() + 2 <= 103)
             {
-                System.Console.WriteLine("\n[ERROR] Not enough RAM for HatchOS to run!");
-                System.Console.Clear();
-                System.Console.ForegroundColor = ConsoleColor.Red;
-                System.Console.Write("[================================ KERNEL PANIC ================================]WARNING!\nYou do not have enough RAM to run HatchOS!\nAt least 108 MB is required, but you only have " + CPU.GetAmountOfRAM() + 2 + "MB.\n");
-                System.Console.ForegroundColor = ConsoleColor.White;
-                System.Console.SetCursorPosition(0, 21);
-                System.Console.Write("\n\n\nPress any key to shut down.");
-                System.Console.ReadKey(true);
-                PowerFunctions.Shutdown();
-            }
-
-            // Assign bitmaps (using embedded resources)
-            DisplayConsoleMsg("[INFO] >> Assigning variables...");
-            PowerGradientBG = Image.FromBitmap(PowerGradientData);
-            CloseWindow = Image.FromBitmap(CloseWindowData);
-            MouseNormal = Image.FromBitmap(MouseNormalData);
-            Wallpaper = Image.FromBitmap(WallpaperData);
-            MouseLink = Image.FromBitmap(MouseLinkData);
-            MouseMove = Image.FromBitmap(MouseMoveData);
-            OSLogo = Image.FromBitmap(LogoData);
-
-            // Set the mouse cursor icon
-            Mouse = MouseNormal;
-
-            // Assign color(s)
-            TaskBarColor = PrismGraphics.Color.GetPacked(255, 123, 150, 149);
-
-            // Assign unsigned integers
-            AvailableRam = (uint)GCImplementation.GetAvailableRAM() * 1024;
-
-            // If we aren't running in VMWare, print a warning, wait for the user to press a key
-            DisplayConsoleMsg("[INFO] >> Testing for VMSVGAII...");
-            if (!VMTools.IsVMWare)
-            {
-                System.Console.WriteLine("\n[WARN] HatchOS is running outside of VMWare.");
-                System.Console.Clear();
-                System.Console.ForegroundColor = ConsoleColor.Yellow;
-                System.Console.Write("[================================= DISCLAIMER =================================]WARNING!\nYou are running HatchOS in an enviornment that is not virtualized, or\nthe vm you're using isn't VMWare. You will most likely run into\nperformance and/or stability issues!\nHatchOS may work under the current enviornment, or it may not.\nThere is no garuntee.\nThere is also a risk for data loss, so you'll need to be extremely careful\nwhen you run this OS.\n");
-                System.Console.ForegroundColor = ConsoleColor.White;
-                System.Console.SetCursorPosition(0, 21);
-                System.Console.Write("\nPress C to accept this disclaimer and continue\n     or\nPress S to shut down.");
-                while (true)
-                {
-                    var key = System.Console.ReadKey(true);
-                    if (key.Key == ConsoleKey.S)
-                        PowerFunctions.Shutdown();
-
-                    if (key.Key == ConsoleKey.C)
-                        break;
-                }
-                //System.Console.Clear();
+                canvas = Display.GetDisplay(640, 480);
+                KernelPanic.Panic("INSUFFICIENT MEMORY", "0x0A0E");
             }
 
             // Attempt to create a canvas with the specified width and height
-            DisplayConsoleMsg("[INFO] >> Creating a canvas...");
+            DisplayConsoleMsg("[INFO] >> Initializing display...");
             try
             {
-                canvas = new((ushort)ScreenWidth, (ushort)ScreenHeight);
+                canvas = Display.GetDisplay((ushort)ScreenWidth, (ushort)ScreenHeight);
+                DisplayConsoleMsg($"[INFO] >> Using canvas type \"{canvas.GetName()}\", with a resolution of: \"{ScreenWidth}x{ScreenHeight}\"");
             }
-            catch
+            catch(Exception ex)
             {
-                DisplayConsoleError("\n[ERROR] Failed to create a canvas!\nPress any key to reboot.");
-                System.Console.ReadKey(true);
+                DisplayConsoleError($"\n[ERROR] Failed to initialize display!\n{ex.Message}");
                 PowerFunctions.Restart();
             }
 
             // If the canvas is null, do the following:
             //      1. Print an error
-            //      2. Wait for the user to press a key
-            //      3. Reboot the system
+            //      2. Start the backup shell
             if (canvas == null || canvas.Width <= 0 || canvas.Height <= 0)
             {
-                DisplayConsoleError("\n[ERROR] Failed to create a canvas!\nPress any key to reboot.");
-                System.Console.ReadKey(true);
-                PowerFunctions.Restart();
+                DisplayConsoleError("\n[ERROR] >> Failed to create a canvas!");
+                BackupShell.Init();
             }
 
             // Set mouse properties
@@ -202,59 +174,141 @@ namespace HatchOS
             MouseManager.MouseSensitivity = 1f;
             MouseManager.ScreenWidth = (uint)ScreenWidth;
             MouseManager.ScreenHeight = (uint)ScreenHeight;
-            MouseManager.X = ((uint)ScreenWidth / 2) - (uint)(Mouse.Width / 2);
-            MouseManager.Y = ((uint)ScreenHeight / 2) - ((uint)Mouse.Height / 2);
-            MouseX = ((uint)ScreenWidth / 2) - ((uint)Mouse.Width / 2);
-            MouseY = ((uint)ScreenHeight / 2) - ((uint)Mouse.Height / 2);
-
-            // Register the PIT timer
-            //DisplayConsoleMsg("[INFO] >> Registering PIT timer...");
-            //Cosmos.HAL.Global.PIT.RegisterTimer(Timer);
-
-            // Assign timers and propereties
-            //HeapCollectionTimer = new Timer((object? O) => Heap.Collect(), null, 0, 1000);
-
-            // Instantiate the API
-            //DisplayConsoleMsg("[INFO] >> Instantiating the HatchOS API...");
-            //API api = new API();
+            MouseManager.X = (uint)(ScreenWidth / 2) - (uint)(Mouse.Width / 2);
+            MouseManager.Y = (uint)(ScreenHeight / 2) - (uint)(Mouse.Height / 2);
+            MouseX = MouseManager.X;
+            MouseY = MouseManager.Y;
 
             // Display the boot screen (if the "EnableBootScreen" boolean is set to true)
             if (EnableBootScreen)
             {
-                canvas.DrawImage(0, 0, PowerGradientBG);
-                canvas.DrawImage((int)(ScreenWidth / 2 - OSLogo.Width / 2), (int)(ScreenHeight / 2 - OSLogo.Height / 2), OSLogo);
-                canvas.DrawString(ScreenWidth / 2 - (21 * 8) / 2, 320, "HatchOS is booting...", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
-                canvas.Update();
+                try
+                {
+                    canvas.Clear(PrismGraphics.Color.GoogleBlue);
+                    canvas.DrawString((int)(ScreenWidth / 2), (int)(ScreenHeight / 2) + 32, "[ Starting HatchOS ]", default, PrismGraphics.Color.White, true);
+                    canvas.Update();
+                    var TempLogo = Image.FromBitmap(LogoData);
+                    canvas.DrawImage((ScreenWidth / 2 - TempLogo.Width / 2), (ScreenHeight / 2 - TempLogo.Height / 2), TempLogo);
+                    canvas.Update();
+                }
+                catch(Exception ex)
+                {
+                    DisplayConsoleError("[ERROR] >> " + ex.Message);
+                }
             }
 
-            DisplayConsoleMsg("[INFO] >> Waiting for canvas to finish initializing...");
+            // Assign points
+            DisplayConsoleMsg("[INFO] >> Assigning variables...");
+            canvas.DrawFilledRectangle(0, 0, (ushort)ScreenWidth, 24, 0, PrismGraphics.Color.GoogleBlue);
+            canvas.DrawString(0, 0, "Assigning variables...", default, PrismGraphics.Color.White);
+            canvas.Update();
+            TimePoint.X = ScreenWidth - 70;
+            TimePoint.Y = ScreenHeight - 38;
+            DatePoint.X = ScreenWidth - 70;
+            DatePoint.Y = ScreenHeight - 20;
+            LogoPoint.X = 8;
+            LogoPoint.Y = ScreenHeight - 36;
+            LogoHighlightPoints.Add(new(4, ScreenHeight - 36));
+            LogoHighlightPoints.Add(new(4, ScreenHeight - 6));
+            LogoHighlightPoints.Add(new(44, ScreenHeight - 36));
+            LogoHighlightPoints.Add(new(45, ScreenHeight - 36));
+            LogoHighlightPoints.Add(new(45, ScreenHeight - 6));
+            LogoHighlightPoints.Add(new(4, ScreenHeight - 5));
+            LogoHighlightPoints.Add(new(45, ScreenHeight - 5));
+            LogoHighlightPoints.Add(new(4, ScreenHeight - 36));
+            LogoHighlightPoints.Add(new(4, ScreenHeight - 6));
+            LogoHighlightPoints.Add(new(4, ScreenHeight - 36));
+            LogoHighlightPoints.Add(new(44, ScreenHeight - 36));
+            LogoHighlightPoints.Add(new(44, ScreenHeight - 36));
+            LogoHighlightPoints.Add(new(44, ScreenHeight - 6));
+            LogoHighlightPoints.Add(new(4, ScreenHeight - 5));
+            LogoHighlightPoints.Add(new(44, ScreenHeight - 6));
 
-            // Try to play the startup sound. This will only work if there's an AC97 audio card (or compatible) in the system
+            // Assign bitmaps (using embedded resources)
+            canvas.DrawFilledRectangle(0, 0, (ushort)ScreenWidth, 24, 0, PrismGraphics.Color.GoogleBlue);
+            canvas.DrawString(0, 0, "Getting bitmap data...", default, PrismGraphics.Color.White);
+            canvas.Update();
+            PowerGradientBG = Image.FromBitmap(PowerGradientData);
+            CloseWindow = Image.FromBitmap(CloseWindowData);
+            MouseNormal = Image.FromBitmap(MouseNormalData);
+            Wallpaper = Image.FromBitmap(WallpaperData);
+            MouseLink = Image.FromBitmap(MouseLinkData);
+            MouseMove = Image.FromBitmap(MouseMoveData);
+            OSLogo = Image.FromBitmap(LogoData);
+            CPUName = CPU.GetCPUBrandString();
+            Mouse = MouseNormal;
+
+            // Assign color(s)
+            canvas.DrawFilledRectangle(0, 0, (ushort)ScreenWidth, 24, 0, PrismGraphics.Color.GoogleBlue);
+            canvas.DrawString(0, 0, "Assigning colors...", default, PrismGraphics.Color.White);
+            canvas.Update();
+            TaskBarColor = PrismGraphics.Color.GetPacked(255, 123, 150, 149);
+            TaskBarGradient = Gradient.GetGradient(1024, 40, TaskBarColor, PrismGraphics.Color.Blue);
+            StartButtonColor = PrismGraphics.Color.GetPacked(255, 63, 90, 89);
+            StartButtonColorPressed = PrismGraphics.Color.GetPacked(255, 33, 60, 59);
+
+            // Assign unsigned integers
+            canvas.DrawFilledRectangle(0, 0, (ushort)ScreenWidth, 24, 0, PrismGraphics.Color.GoogleBlue);
+            canvas.DrawString(0, 0, "Assigning UINTs...", default, PrismGraphics.Color.White);
+            canvas.Update();
+            AvailableRam = (uint)GCImplementation.GetAvailableRAM() * 1024;
+
+            // Create and register the virtual file system
+            DisplayConsoleMsg("[INFO] >> Creating and registering the virtual file system...");
+            canvas.DrawFilledRectangle(0, 0, (ushort)ScreenWidth, 24, 0, PrismGraphics.Color.GoogleBlue);
+            canvas.DrawString(0, 0, "Creating and registering the virtual file system...", default, PrismGraphics.Color.White);
+            canvas.Update();
+            vfs = new();
+            if (vfs.Disks.Count > 0)
+                VFSManager.RegisterVFS(vfs);
+
+            // Attempt to get an IP address if there is a usable NIC installed in the computer
+            if(NetworkDevice.Devices.Count > 0)
+            {
+                DisplayConsoleMsg("[INFO] >> Retrieving IP address from DHCP server...");
+                canvas.DrawFilledRectangle(0, 0, (ushort)ScreenWidth, 24, 0, PrismGraphics.Color.GoogleBlue);
+                canvas.DrawString(0, 0, "Retrieving IP address...", default, PrismGraphics.Color.White);
+                canvas.Update();
+                using (var xClient = new DHCPClient())
+                {
+                    /** Send a DHCP Discover packet **/
+                    //This will automatically set the IP config after DHCP response
+                    xClient.SendDiscoverPacket();
+                }
+
+                if(NetworkConfiguration.CurrentAddress.ToString() != null || NetworkConfiguration.CurrentAddress.ToString() == "0.0.0.0")
+                {
+                    DisplayConsoleMsg("[INFO] >> Got IP address: " + NetworkConfiguration.CurrentAddress.ToString());
+                }
+                else
+                {
+                    DisplayConsoleError("[ERROR] >> Failed to retrieve IP address from a DHCP server!");
+                }
+            }
+            else
+            {
+                DisplayConsoleMsg("[WARN] >> No usable network interface cards were detected.");
+            }
+
+            // Initialize the audio system
             try
             {
-                var driver = AC97.Initialize(4096);
-                var mixer = new AudioMixer();
-                var audioStream = MemoryAudioStream.FromWave(BootSoundAudio);
-                audioStream.PostProcessors.Add(new GainPostProcessor(AudioVolume));
-                mixer.Streams.Add(audioStream);
-                var audioManager = new AudioManager()
-                {
-                    Stream = mixer,
-                    Output = driver
-                };
-                audioManager.Enable();
+                DisplayConsoleMsg("[INFO] >> Initializing audio...");
+                canvas.DrawFilledRectangle(0, 0, (ushort)ScreenWidth, 24, 0, PrismGraphics.Color.GoogleBlue);
+                canvas.DrawString(0, 0, "Initializing audio...", default, PrismGraphics.Color.White);
+                audioDriver = AC97.Initialize(4096);
+                AudioEnabled = true;
             }
             catch (Exception ex)
             {
-                // If the exception is not an invalid operation, return to console mode
-                if (ex is not InvalidOperationException)
-                {
-                    canvas.Dispose();
-                }
-                DisplayConsoleError($"[ERROR] Failed to play the audio file! {ex.Message}");
+                DisplayConsoleError("[ERROR] >> Failed to initialize audio: " + ex.Message);
             }
-            
-            System.Console.Write("Starting HatchOS...");
+
+            DisplayConsoleMsg("[INFO] >> Boot process finished!");
+            canvas.DrawFilledRectangle(0, 0, (ushort)ScreenWidth, 24, 0, PrismGraphics.Color.GoogleBlue);
+            canvas.DrawString(0, 0, "Done!", default, PrismGraphics.Color.White);
+            canvas.Update();
+            Booted = true;
         }
 
         // Executed every frame after BeforeRun() is finished running
@@ -266,12 +320,18 @@ namespace HatchOS
             if (Booted || !EnableBootScreen)
             {
                 System.Console.Write("\n");
+
+                // Try to play the startup sound. This will only work if there's an AC97 audio card (or compatible)
+                // installed in the computer.
+                PlayAudioFromMemory(BootSoundAudio, AudioVolume);
+
+                // Show the desktop
                 ShowGUI();
             }
         }
 
         // Draw everything
-        public void Draw()
+        public static void Draw()
         {
             try
             {
@@ -286,11 +346,18 @@ namespace HatchOS
                 }
 
                 // Draw the taskbar
-                canvas.DrawFilledRectangle(0, ScreenHeight - 40, (ushort)ScreenWidth, 40, 0, TaskBarColor);
+                canvas.DrawFilledRectangle(0, (ushort)(ScreenHeight - 40), (ushort)ScreenWidth, 40, 0, TaskBarColor);
+                canvas.DrawFilledRectangle(OSLogo.Width + 16, LogoPoint.Y, 4, 32, 0, StartButtonColor);
 
                 // If the OS menu should be visible, draw it
                 if (ShowMenu)
                 {
+                    canvas.DrawFilledRectangle(4, ScreenHeight - 36, 40, 32, 0, StartButtonColorPressed);
+                    canvas.DrawLine(LogoHighlightPoints[0].X, LogoHighlightPoints[0].Y, LogoHighlightPoints[1].X, LogoHighlightPoints[1].Y, PrismGraphics.Color.Black);
+                    canvas.DrawLine(LogoHighlightPoints[0].X, LogoHighlightPoints[0].Y, LogoHighlightPoints[2].X, LogoHighlightPoints[2].Y, PrismGraphics.Color.Black);
+                    canvas.DrawLine(LogoHighlightPoints[3].X, LogoHighlightPoints[3].Y, LogoHighlightPoints[4].X, LogoHighlightPoints[4].Y, PrismGraphics.Color.White);
+                    canvas.DrawLine(LogoHighlightPoints[5].X, LogoHighlightPoints[5].Y, LogoHighlightPoints[6].X, LogoHighlightPoints[6].Y, PrismGraphics.Color.White);
+
                     // Menu background
                     canvas.DrawFilledRectangle(0, ScreenHeight / 2, 170, (ushort)Math.Abs(ScreenHeight / 2 - (ScreenHeight - 40)), 0, PrismGraphics.Color.GetPacked(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B));
 
@@ -302,32 +369,43 @@ namespace HatchOS
                     canvas.DrawFilledRectangle(87, ScreenHeight - 78, 64, 20, 0, PrismGraphics.Color.LightGray);
                     canvas.DrawString(88, ScreenHeight - 78, "Restart", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
                 }
-
-                /*if(GCImplementation.GetAvailableRAM() - GCImplementation.GetUsedRAM() / (1024 * 1024) <= 25 && Debug)
+                else
                 {
-                    // Error background
-                    canvas.DrawFilledRectangle(ScreenWidth / 2 - 320 / 2, ScreenHeight / 2, 320, (ushort)Math.Abs(ScreenHeight / 2 - 40), 0, PrismGraphics.Color.GetPacked(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B));
+                    canvas.DrawFilledRectangle(4, ScreenHeight - 36, 40, 32, 0, StartButtonColor);
+                    canvas.DrawLine(LogoHighlightPoints[7].X, LogoHighlightPoints[7].Y, LogoHighlightPoints[8].X, LogoHighlightPoints[8].Y, PrismGraphics.Color.White);
+                    canvas.DrawLine(LogoHighlightPoints[9].X, LogoHighlightPoints[9].Y, LogoHighlightPoints[10].X, LogoHighlightPoints[10].Y, PrismGraphics.Color.White);
+                    canvas.DrawLine(LogoHighlightPoints[11].X, LogoHighlightPoints[11].Y, LogoHighlightPoints[12].X, LogoHighlightPoints[12].Y, PrismGraphics.Color.Black);
+                    canvas.DrawLine(LogoHighlightPoints[13].X, LogoHighlightPoints[13].Y, LogoHighlightPoints[14].X, LogoHighlightPoints[14].Y, PrismGraphics.Color.Black);
+                }
 
-                    // Shutdown button
-                    canvas.DrawFilledRectangle(12, ScreenHeight - 78, 64, 20, 0, PrismGraphics.Color.LightGray);
-                    canvas.DrawString(13, ScreenHeight - 78, "Exit OS", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
-
-                    // Restart button
-                    canvas.DrawFilledRectangle(87, ScreenHeight - 78, 64, 20, 0, PrismGraphics.Color.LightGray);
-                    canvas.DrawString(88, ScreenHeight - 78, "Restart", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
-                }*/
+                // If there is only 50 MB of ram left, enter emergency mode
+                if(AvailableRam - GCImplementation.GetUsedRAM() / 1024 <= 51200)
+                {
+                    // Display a custom power screen
+                    PowerFunctions.UsingCustomPowerMenu = true;
+                    PowerFunctions.AllowEscapeKey = false;
+                    PowerFunctions.CustomTitle = "[===== CRITICAL ERROR: LOW RAM =====]";
+                    PowerFunctions.CustomMessage = "Please choose a power option.";
+                    PowerFunctions.CustomTitleColor = PrismGraphics.Color.Red;
+                    PowerFunctions.CustomMessageColor = PrismGraphics.Color.White;
+                    PowerFunctions.PowerOff(canvas, "-sr");
+                }
 
                 // Draw task bar elements (Time, Date, and OS Logo)
-                canvas.DrawImage(8, ScreenHeight - 36, OSLogo);
-                canvas.DrawString(ScreenWidth - 70, ScreenHeight - 35, RTC.Hour + ":" + RTC.Minute + ":" + RTC.Second, PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
-                canvas.DrawString(ScreenWidth - 70, ScreenHeight - 20, RTC.Month + ":" + RTC.DayOfTheMonth + ":" + RTC.Year, PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
+                canvas.DrawImage(LogoPoint.X, LogoPoint.Y, OSLogo);
+                canvas.DrawFilledRectangle((ushort)(ScreenWidth - 88), (ushort)(ScreenHeight - 40), (ushort)(FindDifference(ScreenWidth - 88, ScreenWidth)), 40, 0, StartButtonColor);
+                canvas.DrawString(TimePoint.X, TimePoint.Y, RTC.Hour + ":" + RTC.Minute + ":" + RTC.Second, PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
+                canvas.DrawString(DatePoint.X, DatePoint.Y, RTC.Month + ":" + RTC.DayOfTheMonth + ":" + RTC.Year, PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
 
                 // If the debug text should be visible, draw it
                 if (Debug)
                 {
-                    canvas.DrawString(0, 0, "POS=(X=" + MouseX + ", Y=" + MouseY + ")", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Red);
-                    canvas.DrawString(0, 12, "RAM=" + GCImplementation.GetUsedRAM() / 1024 + "/" + AvailableRam + " KB", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Red);
-                    canvas.DrawString(0, 24, "FPS=" + canvas.GetFPS(), PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Red);
+                    canvas.DrawFilledRectangle(0, 0, (ushort)(CPUName.Length * 10), 64, 0, PrismGraphics.Color.StackOverflowBlack);
+                    canvas.DrawString(0, 0, "POS=(X=" + MouseX + ", Y=" + MouseY + ")", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.StackOverflowWhite);
+                    canvas.DrawString(0, 12, "RAM=" + GCImplementation.GetUsedRAM() / 1024 + "/" + AvailableRam + " KB", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.StackOverflowWhite);
+                    canvas.DrawString(0, 24, "FPS=" + canvas.GetFPS(), PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.StackOverflowWhite);
+                    canvas.DrawString(0, 36, "FRC=" + FrameCount, PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.StackOverflowWhite);
+                    canvas.DrawString(0, 48, "CPU=" + CPUName, PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.StackOverflowWhite);
                 }
 
                 // Draw the mouse cursor (using the DrawImageAlpha function makes sure pixels that
@@ -337,24 +415,29 @@ namespace HatchOS
                 // Since we're using a double-buffered driver, we need to copy the second (non-visible) framebuffer
                 // into the first (visible) framebuffer. This ensures that there is no flickering or screen tearing,
                 // and makes sure the graphics are visible to the user.
+                //if(MouseMoved)
                 canvas.Update();
 
                 // Handle keyboard/mouse input
                 Input.HandleInput();
 
-                // Call the garbage collector so we don't have as many memory leaks. This also helps improve framerates in some cases.
+                // Call the garbage collector so we don't have as many memory leaks. This also helps improve framerates.
                 Heap.Collect();
-            }
-            catch
-            {
 
+                // Increment the frame count once a frame has finished drawing
+                FrameCount++;
+            }
+            catch (Exception ex)
+            {
+                DisplayConsoleMsg("[ERROR] >> " + ex.Message);
             }
         }
 
-        public void ShowGUI()
-        {   
+        public static void ShowGUI()
+        {
             // Create the welcome window
-            WindowManager.CreateNewWindow(WindowList, new Point(ScreenWidth / 2 - 240 / 2, ScreenHeight / 2 - 130), new Point(240, 130), new List<PrismGraphics.Color> { PrismGraphics.Color.GetPacked(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B), PrismGraphics.Color.LightGray, PrismGraphics.Color.Black, PrismGraphics.Color.GetPacked(255, 40, 65, 65) }, "Welcome to HatchOS!");
+            WindowManager.TitlebarGradient = Gradient.GetGradient(240, 40, PrismGraphics.Color.GoogleBlue, PrismGraphics.Color.Blue);
+            WindowManager.CreateNewWindow(WindowList, new Point(ScreenWidth / 2 - 240 / 2, ScreenHeight / 2 - 130), new Point(240, 130), new List<PrismGraphics.Color> { PrismGraphics.Color.GetPacked(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B), PrismGraphics.Color.LightGray, PrismGraphics.Color.Black, PrismGraphics.Color.GetPacked(255, 40, 65, 65) }, "Welcome to HatchOS!", true);
             WindowElement WelcomeText = new WindowElement();
             WelcomeText.ElementType = "StringElement";
             WelcomeText.ElementData = "Welcome to HatchOS!";
@@ -369,16 +452,15 @@ namespace HatchOS
 
             WindowElement VersionText = new WindowElement();
             VersionText.ElementType = "StringElement";
-            VersionText.ElementData = "ALPHA 4-3-23";
+            VersionText.ElementData = VersionString;
             VersionText.ElementPosition = new Point(5, 24);
             WindowList[0].WindowElements.Add(VersionText);
             Draw();
-            Debug = false;
 
             // Display loop
             while (true)
             {
-                // Attempt to draw (for stability reasons lol 🤓)
+                // Attempt to draw (for stability reasons 🤓)
                 try
                 {
                     // Draw the screen
@@ -418,6 +500,9 @@ namespace HatchOS
 
                                 // Draw the screen
                                 Draw();
+
+                                // Close the os menu if it's open
+                                ShowMenu = false;
                             }
 
                             // Set the mouse cursor image
@@ -451,7 +536,7 @@ namespace HatchOS
                 }
                 catch(Exception ex)
                 {
-                    // If we encountered an error, panic
+                    // If we encountered an error, panic and hang
                     KernelPanic.Panic(ex.Message, ex.HResult.ToString());
                 }
             }

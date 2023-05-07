@@ -3,6 +3,8 @@
 import subprocess as sp
 
 ## BUILD CODE ##
+# Print information
+print("[== HatchOS build script ==]\nNote: this script is intended for users who do not want to or cannot use visual studio to compile HatchOS.\n\n\n")
 # Call dotnet to build HatchOS
 rc = sp.call("dotnet build")
 

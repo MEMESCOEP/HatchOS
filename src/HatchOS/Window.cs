@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using Cosmos.HAL;
 using Cosmos.System;
+using PrismGraphics;
 
 /* NAMESPACES */
 namespace HatchOS
@@ -14,10 +15,17 @@ namespace HatchOS
         /* VARIABLES */
         // Boolean(s)
         public bool IsActiveWindow = true;
+        public bool UseGradient = false;
+
+        // Integers
+        int Count = 0;
 
         // List(s)
         public List<PrismGraphics.Color> WindowColors = new List<PrismGraphics.Color>();
         public List<WindowElement> WindowElements = new List<WindowElement>();
+
+        // Gradients
+        public Graphics TitlebarGradient;
 
         // Points
         public Point WindowLocation;
@@ -52,6 +60,8 @@ namespace HatchOS
                 if (IsActiveWindow)
                 {
                     Kernel.canvas.DrawFilledRectangle(WindowLocation.X, WindowLocation.Y, (ushort)WindowSize.X, 40, 0, WindowColors[0]);
+                    if(UseGradient)
+                        Kernel.canvas.DrawImage(WindowLocation.X, WindowLocation.Y, TitlebarGradient, false);
                 }
                 else
                 {
@@ -67,10 +77,10 @@ namespace HatchOS
                 {
                     if(Element.ElementType == "StringElement")
                     {
-                        int Count = 0;
-                        if (Element.ElementData.Contains('\0'))
+                        Count = 0;
+                        if (Element.ElementData.ToString().Contains('\0'))
                         {
-                            foreach (string ConsolePart in Element.ElementData.Split('\0'))
+                            foreach (string ConsolePart in Element.ElementData.ToString().Split('\0'))
                             {
                                 if (ConsolePart != "\0")
                                 {
@@ -83,15 +93,27 @@ namespace HatchOS
                         }
                         else
                         {
-                            Kernel.canvas.DrawString(WindowLocation.X + Element.ElementPosition.X, WindowLocation.Y + 40 + Element.ElementPosition.Y, Element.ElementData, PrismGraphics.Fonts.Font.Fallback, Element.ElementColor);
+                            Kernel.canvas.DrawString(WindowLocation.X + Element.ElementPosition.X, WindowLocation.Y + 40 + Element.ElementPosition.Y, Element.ElementData.ToString(), PrismGraphics.Fonts.Font.Fallback, Element.ElementColor);
                         }
+                    }
+
+                    else if (Element.ElementType == "ImageElement")
+                    {
+                        Graphics image;
+                        byte[] ImageData = new byte[Element.ElementData.Length / 8];
+                        for (int i = 0; i < Element.ElementData.Length / 8; ++i)
+                        {
+                            ImageData[i] = Convert.ToByte(Element.ElementData.ToString().Substring(8 * i, 8), 2);
+                        }
+                        image = Image.FromBitmap(ImageData);
+                        Kernel.canvas.DrawImage(WindowLocation.X + Element.ElementPosition.X, WindowLocation.Y + 40 + Element.ElementPosition.Y, image, true);
                     }
                 }
             }
             catch (Exception ex)
             {
                 // Send an error message over the serial port if an error occured
-                SerialPort.SendString("[ERROR] >> Failed to draw window \"" + WindowTitle + "\":\n\t" + ex.Message + "\n\n", SerialPort.COM1);
+                SerialPort.SendString("[ERROR] >> Failed to draw window \"" + WindowTitle + "\":\n" + ex.Message + "\n\n", SerialPort.COM1);
                 CloseWindow();
             }
         }
@@ -148,6 +170,13 @@ namespace HatchOS
             {
                 Kernel.ActiveWindow = null;
             }
+        }
+
+        // Close the window without affecting the kernel's ActiveWindow property (only to be used when RAM is close to being full)
+        public void CloseWindowEmergency()
+        {
+            // Remove the window from the list
+            Kernel.WindowList.Remove(this);
         }
     }
 }

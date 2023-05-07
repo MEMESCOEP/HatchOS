@@ -12,20 +12,32 @@
         <EnableGDB>False</EnableGDB>
         <StartCosmosGDB>False</StartCosmosGDB>
         <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-        <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
+        <CosmosDebugPort>Serial: COM2</CosmosDebugPort>
         <Launch>VMware</Launch>
         <Profile>VMware</Profile>
         <Description>Use VMware Player or Workstation to deploy and debug.</Description>
         <PxeInterface>192.168.0.8</PxeInterface>
-        <RemoveBootDebugOutput>True</RemoveBootDebugOutput>
-        <OptimizationLevel>2</OptimizationLevel>
-        <Timeout>5</Timeout>
+        <RemoveBootDebugOutput>False</RemoveBootDebugOutput>
+        <OptimizationLevel>0</OptimizationLevel>
         <DebugEnabled>False</DebugEnabled>
-        <CompressionType>Gzip</CompressionType>
-        <CompileVBEMultiboot>False</CompileVBEMultiboot>
-        <VBEResolution>1024x768x32</VBEResolution>
+        <CompressionType>None</CompressionType>
+        <CompileVBEMultiboot>True</CompileVBEMultiboot>
+        <VBEResolution>800x600x32</VBEResolution>
         <BootloaderResolution>640x480x32</BootloaderResolution>
         <BinFormat>Elf</BinFormat>
+        <VMWareEdition>Player</VMWareEdition>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <QemuNetworkDevice>RTL8139</QemuNetworkDevice>
+        <QemuVideoDriver>VBE</QemuVideoDriver>
+        <QemuAudioDriver>AC97</QemuAudioDriver>
+        <QemuUseSerial>True</QemuUseSerial>
+        <QemuHWAccelWHPX>False</QemuHWAccelWHPX>
+        <QemuMemory>256</QemuMemory>
+        <Timeout>5</Timeout>
+        <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+        <ExtractMapFile>True</ExtractMapFile>
+        <DebugCom>2</DebugCom>
+        <TraceMode>User</TraceMode>
     </PropertyGroup>
 
     <ItemGroup>
@@ -44,6 +56,7 @@
       <None Remove="Resources\mouse.bmp" />
       <None Remove="Resources\OS_Logo.bmp" />
       <None Remove="Resources\PowerGradient.bmp" />
+      <None Remove="Resources\shutdown.wav" />
       <None Remove="Resources\xp_arrow.bmp" />
       <None Remove="Resources\xp_link.bmp" />
       <None Remove="Resources\xp_move.bmp" />
@@ -56,6 +69,7 @@
       <EmbeddedResource Include="Resources\mouse.bmp" />
       <EmbeddedResource Include="Resources\OS_Logo.bmp" />
       <EmbeddedResource Include="Resources\PowerGradient.bmp" />
+      <EmbeddedResource Include="Resources\shutdown.wav" />
       <EmbeddedResource Include="Resources\xp_arrow.bmp" />
       <EmbeddedResource Include="Resources\xp_link.bmp" />
       <EmbeddedResource Include="Resources\xp_move.bmp" />

@@ -3,6 +3,11 @@ using Cosmos.HAL;
 using System;
 using System.Drawing;
 using System.Collections.Generic;
+using Cosmos.System.Audio;
+using Cosmos.System.Audio.IO;
+using Cosmos.HAL.Drivers.Audio;
+using Cosmos.System.Audio.DSP.Processing;
+using System.Threading;
 
 /* NAMESPACES */
 namespace HatchOS
@@ -11,6 +16,39 @@ namespace HatchOS
     internal class HelperFunctions
     {
         /* FUNCTIONS */
+        // Play an audio file from memory
+        public static void PlayAudioFromMemory(byte[] AudioData, float Volume, bool Blocking = false)
+        {
+            try
+            {
+                if(!Kernel.AudioEnabled)
+                    throw new Exception("Audio is not enabled!");
+
+                var mixer = new AudioMixer();
+                var audioStream = MemoryAudioStream.FromWave(AudioData);                
+                mixer.Streams.Add(audioStream);
+                mixer.PostProcessors.Add(new GainPostProcessor(Volume));
+                var audioManager = new AudioManager()
+                {
+                    Stream = mixer,
+                    Output = Kernel.audioDriver
+                };
+                audioManager.Enable();
+
+                if (Blocking)
+                {
+                    while (!audioStream.Depleted)
+                    {
+                        Thread.Sleep(1);
+                    }
+                }
+            } 
+            catch (Exception ex)
+            {
+                DisplayConsoleError("[ERROR] >> Audio playback failure: " + ex.Message);
+            }
+        }
+
         // Detect if a value is between two other values
         public static bool IsBetween(int Value, int Min, int Max)
         {
@@ -25,7 +63,7 @@ namespace HatchOS
         }
 
         // Change the mouse cursor image
-        public static void ChangeMouseCursor(PrismGraphics.Image NewImage)
+        public static void ChangeMouseCursor(PrismGraphics.Graphics NewImage)
         {
             Kernel.Mouse = NewImage;
         }
@@ -81,14 +119,14 @@ namespace HatchOS
         public static void DisplayConsoleError(string message)
         {
             Console.WriteLine(message);
-            SerialPort.SendString(message + "\n", SerialPort.COM1);
+            SerialPort.SendString(message + "\r\n", SerialPort.COM1);
         }
 
         // Display a message in console mode and send the same message over serial
         public static void DisplayConsoleMsg(string message)
         {
             Console.WriteLine(message);
-            SerialPort.SendString(message + "\n", SerialPort.COM1);
+            SerialPort.SendString(message + "\r\n", SerialPort.COM1);
         }
 
         // Add a byte to a byte array
@@ -132,6 +170,13 @@ namespace HatchOS
                 }
             }
             return Count;
+        }
+
+        // Check if a serial port is connected and functioning
+        public static bool IsSerialPortConnected(ushort sp)
+        {
+            SerialPort.Send((char)0xAE, (ushort)(sp + 7));
+            return (SerialPort.Receive((ushort)(sp + 7)) != 0xAE);
         }
     }
 }
