@@ -1,6 +1,6 @@
 # HatchOS
-HatchOS is an experimental, [Cosmos](https://www.github.com/CosmosOS/Cosmos) based operating system designed for x86_64 computers.
-
+HatchOS is an experimental, [Cosmos](https://www.github.com/CosmosOS/Cosmos) based operating system designed for x86_64 computers. If you would like to see what HatchOS looks like, click [here](https://www.github.com/memescoep/HatchOS/tree/main/media/media.md).
+<br/>
 The following resources have been used during development:
 * [Cosmos OS development Kit](https://www.github.com/CosmosOS/Cosmos)
 * [PrismOS](https://github.com/Project-Prism/Prism-OS)
@@ -14,7 +14,7 @@ Here is a list of features that are currently implemented:
 * [WIP] Audio system
 * Extremely basic window manager
 * Power functionality (Shutdown, Reboot)
-* Demo 3D Rasterizer (PrismGraphics)
+* Demo 3D Rasterizer (PrismGraphics; Currently broken due to funky cosmos things)
 <hr/>
 <br/>
 
