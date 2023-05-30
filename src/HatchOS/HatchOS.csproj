@@ -17,10 +17,10 @@
         <Profile>VMware</Profile>
         <Description>Use VMware Player or Workstation to deploy and debug.</Description>
         <PxeInterface>192.168.0.8</PxeInterface>
-        <RemoveBootDebugOutput>False</RemoveBootDebugOutput>
-        <OptimizationLevel>0</OptimizationLevel>
+        <RemoveBootDebugOutput>True</RemoveBootDebugOutput>
+        <OptimizationLevel>3</OptimizationLevel>
         <DebugEnabled>False</DebugEnabled>
-        <CompressionType>None</CompressionType>
+        <CompressionType>Gzip</CompressionType>
         <CompileVBEMultiboot>True</CompileVBEMultiboot>
         <VBEResolution>800x600x32</VBEResolution>
         <BootloaderResolution>640x480x32</BootloaderResolution>
@@ -35,7 +35,7 @@
         <QemuMemory>256</QemuMemory>
         <Timeout>5</Timeout>
         <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
-        <ExtractMapFile>True</ExtractMapFile>
+        <ExtractMapFile>False</ExtractMapFile>
         <DebugCom>2</DebugCom>
         <TraceMode>User</TraceMode>
     </PropertyGroup>
@@ -52,27 +52,57 @@
     <ItemGroup>
       <None Remove="Resources\BG_1280x1024.bmp" />
       <None Remove="Resources\BootSound.wav" />
+      <None Remove="Resources\clock.bmp" />
       <None Remove="Resources\close_window.bmp" />
+      <None Remove="Resources\ErrorSound.wav" />
+      <None Remove="Resources\ErrorSymbol.bmp" />
+      <None Remove="Resources\ExclamationSound.wav" />
+      <None Remove="Resources\ExclamationSymbol.bmp" />
       <None Remove="Resources\mouse.bmp" />
+      <None Remove="Resources\notepad.bmp" />
       <None Remove="Resources\OS_Logo.bmp" />
+      <None Remove="Resources\OS_Logo_128x128.bmp" />
+      <None Remove="Resources\OS_Menu.bmp" />
       <None Remove="Resources\PowerGradient.bmp" />
+      <None Remove="Resources\PowerOff.bmp" />
+      <None Remove="Resources\QuestionSymbol.bmp" />
+      <None Remove="Resources\Restart.bmp" />
+      <None Remove="Resources\ReturnToConsole.bmp" />
       <None Remove="Resources\shutdown.wav" />
+      <None Remove="Resources\terminal.bmp" />
+      <None Remove="Resources\WarningSymbol.bmp" />
       <None Remove="Resources\xp_arrow.bmp" />
       <None Remove="Resources\xp_link.bmp" />
       <None Remove="Resources\xp_move.bmp" />
+      <None Remove="Resources\xp_pencil.bmp" />
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Include="Resources\BG_1280x1024.bmp" />
       <EmbeddedResource Include="Resources\BootSound.wav" />
+      <EmbeddedResource Include="Resources\clock.bmp" />
       <EmbeddedResource Include="Resources\close_window.bmp" />
+      <EmbeddedResource Include="Resources\ErrorSound.wav" />
+      <EmbeddedResource Include="Resources\ErrorSymbol.bmp" />
+      <EmbeddedResource Include="Resources\ExclamationSound.wav" />
+      <EmbeddedResource Include="Resources\ExclamationSymbol.bmp" />
       <EmbeddedResource Include="Resources\mouse.bmp" />
+      <EmbeddedResource Include="Resources\notepad.bmp" />
       <EmbeddedResource Include="Resources\OS_Logo.bmp" />
+      <EmbeddedResource Include="Resources\OS_Logo_128x128.bmp" />
+      <EmbeddedResource Include="Resources\OS_Menu.bmp" />
       <EmbeddedResource Include="Resources\PowerGradient.bmp" />
+      <EmbeddedResource Include="Resources\PowerOff.bmp" />
+      <EmbeddedResource Include="Resources\QuestionSymbol.bmp" />
+      <EmbeddedResource Include="Resources\Restart.bmp" />
+      <EmbeddedResource Include="Resources\ReturnToConsole.bmp" />
       <EmbeddedResource Include="Resources\shutdown.wav" />
+      <EmbeddedResource Include="Resources\terminal.bmp" />
+      <EmbeddedResource Include="Resources\WarningSymbol.bmp" />
       <EmbeddedResource Include="Resources\xp_arrow.bmp" />
       <EmbeddedResource Include="Resources\xp_link.bmp" />
       <EmbeddedResource Include="Resources\xp_move.bmp" />
+      <EmbeddedResource Include="Resources\xp_pencil.bmp" />
     </ItemGroup>
 
     <ItemGroup>
@@ -86,8 +116,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="PrismGraphics">
-        <HintPath>Libraries\PrismGraphics.dll</HintPath>
+      <Reference Include="PrismAPI">
+        <HintPath>Libraries\PrismAPI.dll</HintPath>
       </Reference>
     </ItemGroup>
 

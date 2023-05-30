@@ -5,9 +5,9 @@ using System.Drawing;
 using System.Collections.Generic;
 using Cosmos.System.Audio;
 using Cosmos.System.Audio.IO;
-using Cosmos.HAL.Drivers.Audio;
 using Cosmos.System.Audio.DSP.Processing;
 using System.Threading;
+using PrismAPI.Graphics;
 
 /* NAMESPACES */
 namespace HatchOS
@@ -63,7 +63,7 @@ namespace HatchOS
         }
 
         // Change the mouse cursor image
-        public static void ChangeMouseCursor(PrismGraphics.Graphics NewImage)
+        public static void ChangeMouseCursor(Canvas NewImage)
         {
             Kernel.Mouse = NewImage;
         }
@@ -89,9 +89,9 @@ namespace HatchOS
                 list.Insert(NewIndex, item);
                 list.RemoveAt(OldIndex);
             }
-            catch
+            catch(Exception ex)
             {
-                KernelPanic.Panic("Failed to rearrange list!", "0x76239");
+                KernelPanic.Panic("Failed to rearrange list! " + ex.Message, ex.HResult.ToString());
             }
         }
 
@@ -118,15 +118,21 @@ namespace HatchOS
         // Display an error in console mode and send the same message over serial
         public static void DisplayConsoleError(string message)
         {
-            Console.WriteLine(message);
-            SerialPort.SendString(message + "\r\n", SerialPort.COM1);
+            if (Kernel.Debug)
+            {
+                Console.WriteLine(message);
+                SerialPort.SendString(message + "\r\n");
+            }
         }
 
         // Display a message in console mode and send the same message over serial
         public static void DisplayConsoleMsg(string message)
         {
-            Console.WriteLine(message);
-            SerialPort.SendString(message + "\r\n", SerialPort.COM1);
+            if (Kernel.Debug)
+            {
+                Console.WriteLine(message);
+                SerialPort.SendString(message + "\r\n");
+            }
         }
 
         // Add a byte to a byte array
@@ -175,8 +181,8 @@ namespace HatchOS
         // Check if a serial port is connected and functioning
         public static bool IsSerialPortConnected(ushort sp)
         {
-            SerialPort.Send((char)0xAE, (ushort)(sp + 7));
-            return (SerialPort.Receive((ushort)(sp + 7)) != 0xAE);
+            SerialPort.Send((char)0xAE, COMPort.COM1);
+            return (SerialPort.Receive(COMPort.COM1) != 0xAE);
         }
     }
 }

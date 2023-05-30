@@ -8,6 +8,8 @@ using Cosmos.System;
 using Cosmos.Core.Memory;
 using static HatchOS.HelperFunctions;
 using static HatchOS.PowerFunctions;
+using PrismAPI.Graphics;
+using Color = PrismAPI.Graphics.Color;
 
 /* NAMESPACES */
 namespace HatchOS
@@ -48,6 +50,7 @@ namespace HatchOS
             if (key.Key == ConsoleKeyEx.LWin || key.Key == ConsoleKeyEx.RWin)
             {
                 Kernel.ShowMenu = !Kernel.ShowMenu;
+                Kernel.StartMenuController.Reset();
             }
 
             // If the F12 key is pressed, toggle debug info
@@ -87,8 +90,9 @@ namespace HatchOS
             if (key.Key == ConsoleKeyEx.F11)
             {
                 Kernel.canvas.DrawImage(0, 0, Kernel.PowerGradientBG, false);
-                Kernel.canvas.DrawString(0, 0, "THE SERIAL SHELL IS CURRENTLY RUNNING", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+                Kernel.canvas.DrawString(0, 0, "THE SERIAL SHELL IS CURRENTLY RUNNING", default, Color.White);
                 Kernel.canvas.Update();
+                Kernel.Debug = true;
                 BackupShell.Init();
             }
 
@@ -101,30 +105,43 @@ namespace HatchOS
             // Display a 3D demo
             if (key.Key == ConsoleKeyEx.F5)
             {
-                PrismGraphics.Rasterizer.Engine engine = new(800, 600, 60);
-                engine.Objects.Add(PrismGraphics.Rasterizer.Mesh.GetCube(250, 250, 250));
-                engine.Objects[0].Triangles[0].Color = PrismGraphics.Color.Red;
+                PS2Controller controller = new();
+                PrismAPI.Graphics.Rasterizer.Engine engine = new(800, 600, 60);
+                engine.Objects.Add(PrismAPI.Graphics.Rasterizer.Mesh.GetCube(250, 250, 250));
+                engine.Objects.Add(PrismAPI.Graphics.Rasterizer.Mesh.GetCube(100, 100, 100));
 
                 int ColorValue = 0;
 
                 foreach(var Triangle in engine.Objects[0].Triangles)
                 {
-                    Triangle.Color = PrismGraphics.Color.GetPacked(255, ColorValue, ColorValue, ColorValue);
+                    Triangle.Color = new(255, ColorValue, ColorValue, ColorValue);
                     ColorValue += engine.Objects[0].Triangles.Count;
+                }
+
+                ColorValue = 0;
+
+                foreach (var Triangle in engine.Objects[1].Triangles)
+                {
+                    Triangle.Color = new(255, ColorValue, ColorValue, ColorValue);
+                    ColorValue += engine.Objects[1].Triangles.Count + 32;
                 }
 
                 while (true)
                 {
+                    //Kernel.canvas.DrawString(0, 24, "ROT=" + engine.Objects[0].Rotation.ToString(), default, Color.White);
+                    //Kernel.canvas.DrawString(0, 36, "POS=" + engine.Objects[0].Position.ToString(), default, Color.White);
+                    //Kernel.canvas.DrawString(0, 48, "PS2=" + controller.ReadByteAfterAck().ToString(), default, Color.White);
+                    //engine.Objects[0].Rotation.X += 0.01f;
+                    //engine.Objects[0].Rotation.Y += 0.01f;
+                    //engine.Objects[0].Rotation.Z += 0.01f;
+
                     KeyboardManager.TryReadKey(out var Key3D);
+                    var PS2Key = controller.ReadByteAfterAck().ToString();
                     engine.Render();
                     Kernel.canvas.DrawImage(0, 0, engine);
-                    Kernel.canvas.DrawString(0, 0, "Press ESCAPE to exit", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
-                    Kernel.canvas.DrawString(0, 12, "FPS=" + Kernel.canvas.GetFPS(), PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+                    Kernel.canvas.DrawString(0, 0, "Press ESCAPE to exit", default, Color.White);
+                    Kernel.canvas.DrawString(0, 12, "FPS=" + Kernel.canvas.GetFPS(), default, Color.White);
                     Kernel.canvas.Update();
-
-                    engine.Objects[0].Rotation.X += 0.01f;
-                    engine.Objects[0].Rotation.Y += 0.01f;
-                    engine.Objects[0].Rotation.Z += 0.01f;
 
                     if(Key3D.Key != ConsoleKeyEx.NoName)
                     {
@@ -132,22 +149,38 @@ namespace HatchOS
                         {
                             break;
                         }
-                        else if (Key3D.Key == ConsoleKeyEx.UpArrow)
+                        else if (PS2Key == "17" || Key3D.Key == ConsoleKeyEx.UpArrow || Key3D.Key == ConsoleKeyEx.W)
                         {
                             engine.Objects[0].Position.Y -= 15;
                         }
-                        else if (Key3D.Key == ConsoleKeyEx.DownArrow)
+                        else if (PS2Key == "31" || Key3D.Key == ConsoleKeyEx.DownArrow || Key3D.Key == ConsoleKeyEx.S)
                         {
                             engine.Objects[0].Position.Y += 15;
                         }
-                        else if (Key3D.Key == ConsoleKeyEx.LeftArrow)
+                        else if (PS2Key == "30" || Key3D.Key == ConsoleKeyEx.LeftArrow || Key3D.Key == ConsoleKeyEx.A)
                         {
                             engine.Objects[0].Position.X -= 15;
                         }
-                        else if (Key3D.Key == ConsoleKeyEx.RightArrow)
+                        else if (PS2Key == "32" || Key3D.Key == ConsoleKeyEx.RightArrow || Key3D.Key == ConsoleKeyEx.D)
                         {
                             engine.Objects[0].Position.X += 15;
                         }
+                        else if (PS2Key == "16" || Key3D.Key == ConsoleKeyEx.Q)
+                        {
+                            engine.Objects[0].Position.Z -= 15;
+                        }
+                        else if (PS2Key == "18" || Key3D.Key == ConsoleKeyEx.E)
+                        {
+                            engine.Objects[0].Position.Z += 15;
+                        }
+                        else if(PS2Key == "19" || Key3D.Key == ConsoleKeyEx.R)
+                        {
+                            engine.Objects[0].Rotation = new(0, 0, 0);
+                            engine.Objects[0].Position = new(0, 0, 0);
+                        }
+
+                        engine.Objects[0].Rotation.X += -MouseManager.DeltaX * MouseManager.MouseSensitivity * 0.01f;
+                        engine.Objects[0].Rotation.Y += MouseManager.DeltaY * MouseManager.MouseSensitivity * 0.01f;
                     }
 
                     Heap.Collect();
@@ -164,23 +197,26 @@ namespace HatchOS
             // Create a new debug window when the F8 key is pressed
             if (key.Key == ConsoleKeyEx.F8)
             {
-                WindowManager.CreateNewWindow(Kernel.WindowList, new Point(64, 64), new Point(300, 200), new List<PrismGraphics.Color> { PrismGraphics.Color.GetPacked(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B), PrismGraphics.Color.LightGray, PrismGraphics.Color.Black, PrismGraphics.Color.GetPacked(255, 40, 65, 65) }, "TEST WINDOW " + Kernel.WindowList.Count);
+                WindowManager.CreateNewWindow(Kernel.WindowList, new Point(64, 64), new Point(300, 200), new List<Color> { new(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B), Color.LightGray, Color.Black, new(255, 40, 65, 65) }, "TEST WINDOW " + Kernel.WindowList.Count);
             }
 
             // Interpret a sample batch script
             if (key.Key == ConsoleKeyEx.F9)
             {
-                BatchInterpreter.InterpretBatchScript("SET A=0\nmsgbox(\"bruh\", \"amoGnUS!!!111!1111!!11\")");
+                WindowManager.CreateMessageBox("TEST ERROR", "This is a test message!\nThe message type is 0, which means ERROR.", 0);
+                //WindowManager.CreateMessageBox("TEST WARNING", "This is a test message!\nThe message type is 0, which means WARNING.", 1);
+                //WindowManager.CreateMessageBox("TEST EXCLAMATION", "This is a test message!\nThe message type is 0, which means EXCLAMATION.", 2);
+                //WindowManager.CreateMessageBox("TEST QUESTION", "This is a test message!\nThe message type is 0, which means QUESTION.", 3);
             }
 
             // Create a terminal
             if (key.Key == ConsoleKeyEx.F10)
             {
-                WindowManager.CreateNewWindow(Kernel.WindowList, new Point(64, 64), new Point(200, 120), new List<PrismGraphics.Color> { PrismGraphics.Color.GetPacked(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B), PrismGraphics.Color.Black, PrismGraphics.Color.Black, PrismGraphics.Color.GetPacked(255, 40, 65, 65) }, "TERMINAL");
+                WindowManager.CreateNewWindow(Kernel.WindowList, new Point(64, 64), new Point(200, 120), new List<Color> { new(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B), Color.Black, Color.Black, new(255, 40, 65, 65) }, "TERMINAL");
                 WindowElement TerminalText = new WindowElement();
                 TerminalText.ElementType = "StringElement";
                 TerminalText.ElementData = ">> _";
-                TerminalText.ElementColor = PrismGraphics.Color.White;
+                TerminalText.ElementColor = Color.White;
                 TerminalText.ElementPosition = new Point(0, 0);
                 Kernel.ActiveWindow.WindowElements.Add(TerminalText);
             }
@@ -198,6 +234,7 @@ namespace HatchOS
                 if (MouseManager.MouseState == MouseState.Left)
                 {
                     MouseManager.HandleMouse((int)Kernel.MouseX * 0, (int)Kernel.MouseY * 0, 1, 0);
+                    Kernel.StartMenuController.Reset();
                     Kernel.ShowMenu = !Kernel.ShowMenu;
                 }
             }
@@ -308,7 +345,7 @@ namespace HatchOS
         public static void OpenHelpWindow()
         {
             // Create the welcome window
-            WindowManager.CreateNewWindow(Kernel.WindowList, new Point(0, 0), new Point(640, 480), new List<PrismGraphics.Color> { PrismGraphics.Color.GetPacked(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B), PrismGraphics.Color.LightGray, PrismGraphics.Color.Black, PrismGraphics.Color.GetPacked(255, 40, 65, 65) }, "HatchOS Help");
+            WindowManager.CreateNewWindow(Kernel.WindowList, new Point(0, 0), new Point(640, 480), new List<Color> { new(System.Drawing.Color.DarkSlateGray.A, System.Drawing.Color.DarkSlateGray.R, System.Drawing.Color.DarkSlateGray.G, System.Drawing.Color.DarkSlateGray.B), Color.LightGray, Color.Black, new(255, 40, 65, 65) }, "HatchOS Help");
             WindowElement WelcomeText = new WindowElement();
             WelcomeText.ElementType = "StringElement";
             WelcomeText.ElementData = "Keyb. shortcuts:";

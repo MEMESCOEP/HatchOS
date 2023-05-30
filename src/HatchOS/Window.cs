@@ -4,7 +4,8 @@ using System.Drawing;
 using System.Collections.Generic;
 using Cosmos.HAL;
 using Cosmos.System;
-using PrismGraphics;
+using PrismAPI.Graphics;
+using Color = PrismAPI.Graphics.Color;
 
 /* NAMESPACES */
 namespace HatchOS
@@ -21,11 +22,11 @@ namespace HatchOS
         int Count = 0;
 
         // List(s)
-        public List<PrismGraphics.Color> WindowColors = new List<PrismGraphics.Color>();
+        public List<Color> WindowColors = new List<Color>();
         public List<WindowElement> WindowElements = new List<WindowElement>();
 
         // Gradients
-        public Graphics TitlebarGradient;
+        public Canvas TitlebarGradient;
 
         // Points
         public Point WindowLocation;
@@ -52,7 +53,7 @@ namespace HatchOS
                 if(WindowColors.Count < 4)
                 {
                     for(int i = WindowColors.Count; i < 4; i++)
-                        WindowColors.Add(PrismGraphics.Color.Black);
+                        WindowColors.Add(Color.Black);
                 }
 
                 // If the window is the active window, draw the original titlebar color
@@ -65,14 +66,14 @@ namespace HatchOS
                 }
                 else
                 {
-                    Kernel.canvas.DrawFilledRectangle(WindowLocation.X, WindowLocation.Y, (ushort)WindowSize.X, 40, 0, PrismGraphics.Color.GetPacked(Math.Max(WindowColors[0].A, 0), Math.Max(WindowColors[0].R - 30, 0), Math.Max(WindowColors[0].G - 30, 0), Math.Max(WindowColors[0].B - 30, 0)));
+                    Kernel.canvas.DrawFilledRectangle(WindowLocation.X, WindowLocation.Y, (ushort)WindowSize.X, 40, 0, new(Math.Max(WindowColors[0].A, 0), Math.Max(WindowColors[0].R - 30, 0), Math.Max(WindowColors[0].G - 30, 0), Math.Max(WindowColors[0].B - 30, 0)));
                 }
 
                 // Draw the window
                 Kernel.canvas.DrawFilledRectangle(WindowLocation.X, WindowLocation.Y + 40, (ushort)WindowSize.X, (ushort)((ushort)WindowSize.Y - 40), 0, WindowColors[1]);
                 Kernel.canvas.DrawFilledRectangle(WindowLocation.X + WindowSize.X - 42, WindowLocation.Y, 42, 40, 0, WindowColors[3]);
                 Kernel.canvas.DrawImage(WindowLocation.X + WindowSize.X - (int)Kernel.CloseWindow.Width - 12, WindowLocation.Y + 20 - (int)Kernel.CloseWindow.Height / 2, Kernel.CloseWindow, false);
-                Kernel.canvas.DrawString(WindowLocation.X + 25, WindowLocation.Y + 10, WindowTitle, PrismGraphics.Fonts.Font.Fallback, WindowColors[2]);
+                Kernel.canvas.DrawString(WindowLocation.X + 25, WindowLocation.Y + 10, WindowTitle, default, WindowColors[2]);
                 foreach(var Element in WindowElements)
                 {
                     if(Element.ElementType == "StringElement")
@@ -84,8 +85,7 @@ namespace HatchOS
                             {
                                 if (ConsolePart != "\0")
                                 {
-                                    //Kernel.canvas.DrawString("", PrismGraphics.Fonts.Font.Fallback, Element.ElementColor, WindowLocation.X + Element.ElementPosition.X, WindowLocation.Y + 40 + Element.ElementPosition.Y + Count);
-                                    Kernel.canvas.DrawString(WindowLocation.X + Element.ElementPosition.X, WindowLocation.Y + 40 + Element.ElementPosition.Y + Count, ConsolePart, PrismGraphics.Fonts.Font.Fallback, Element.ElementColor);
+                                    Kernel.canvas.DrawString(WindowLocation.X + Element.ElementPosition.X, WindowLocation.Y + 40 + Element.ElementPosition.Y + Count, ConsolePart, default, Element.ElementColor);
                                 }
 
                                 Count += 16;
@@ -93,27 +93,22 @@ namespace HatchOS
                         }
                         else
                         {
-                            Kernel.canvas.DrawString(WindowLocation.X + Element.ElementPosition.X, WindowLocation.Y + 40 + Element.ElementPosition.Y, Element.ElementData.ToString(), PrismGraphics.Fonts.Font.Fallback, Element.ElementColor);
+                            Kernel.canvas.DrawString(WindowLocation.X + Element.ElementPosition.X, WindowLocation.Y + 40 + Element.ElementPosition.Y, Element.ElementData.ToString(), default, Element.ElementColor);
                         }
                     }
 
                     else if (Element.ElementType == "ImageElement")
                     {
-                        Graphics image;
-                        byte[] ImageData = new byte[Element.ElementData.Length / 8];
-                        for (int i = 0; i < Element.ElementData.Length / 8; ++i)
-                        {
-                            ImageData[i] = Convert.ToByte(Element.ElementData.ToString().Substring(8 * i, 8), 2);
-                        }
-                        image = Image.FromBitmap(ImageData);
-                        Kernel.canvas.DrawImage(WindowLocation.X + Element.ElementPosition.X, WindowLocation.Y + 40 + Element.ElementPosition.Y, image, true);
+                        Kernel.canvas.DrawImage(WindowLocation.X + Element.ElementPosition.X, WindowLocation.Y + 40 + Element.ElementPosition.Y, Image.FromBitmap(Convert.FromBase64String(Element.ElementData)), true);
                     }
                 }
             }
             catch (Exception ex)
             {
                 // Send an error message over the serial port if an error occured
-                SerialPort.SendString("[ERROR] >> Failed to draw window \"" + WindowTitle + "\":\n" + ex.Message + "\n\n", SerialPort.COM1);
+                if (Kernel.Debug)
+                    SerialPort.SendString("[ERROR] >> Failed to draw window \"" + WindowTitle + "\":\n" + ex.Message + "\n\n", COMPort.COM1);
+
                 CloseWindow();
             }
         }

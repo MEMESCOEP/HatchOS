@@ -1,4 +1,6 @@
 ﻿using System.Drawing;
+using PrismAPI.Graphics;
+using Color = PrismAPI.Graphics.Color;
 
 namespace HatchOS
 {
@@ -6,7 +8,7 @@ namespace HatchOS
     {
         public string ElementType = "StringElement";
         public string ElementData;
-        public PrismGraphics.Color ElementColor = PrismGraphics.Color.Black;
+        public Color ElementColor = Color.Black;
         public Point ElementPosition = new Point(0, 0);
     }
 }

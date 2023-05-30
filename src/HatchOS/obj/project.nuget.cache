@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "x7IaK4rWg0vcedlvaXRy7fkckI53RONa4FMgVx1T9P4ZKc4kAkvqSSGq48iaR7p+jFxW5QSrbtmRHdKnjhP3nw==",
+  "success": true,
+  "projectFilePath": "D:\\Programming\\C#\\HatchOS\\HatchOS\\HatchOS.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Andrew\\.nuget\\packages\\cosmos.build\\0.1.0-localbuild20230523083850\\cosmos.build.0.1.0-localbuild20230523083850.nupkg.sha512",
+    "C:\\Users\\Andrew\\.nuget\\packages\\cosmos.common\\0.1.0-localbuild20230523083855\\cosmos.common.0.1.0-localbuild20230523083855.nupkg.sha512",
+    "C:\\Users\\Andrew\\.nuget\\packages\\cosmos.core\\0.1.0-localbuild20230523083855\\cosmos.core.0.1.0-localbuild20230523083855.nupkg.sha512",
+    "C:\\Users\\Andrew\\.nuget\\packages\\cosmos.debug.kernel\\0.1.0-localbuild20230523083855\\cosmos.debug.kernel.0.1.0-localbuild20230523083855.nupkg.sha512",
+    "C:\\Users\\Andrew\\.nuget\\packages\\cosmos.hal2\\0.1.0-localbuild20230523083855\\cosmos.hal2.0.1.0-localbuild20230523083855.nupkg.sha512",
+    "C:\\Users\\Andrew\\.nuget\\packages\\cosmos.system2\\0.1.0-localbuild20230523083855\\cosmos.system2.0.1.0-localbuild20230523083855.nupkg.sha512",
+    "C:\\Users\\Andrew\\.nuget\\packages\\il2cpu.api\\0.1.0-localbuild20230523083855\\il2cpu.api.0.1.0-localbuild20230523083855.nupkg.sha512"
+  ],
+  "logs": []
+}

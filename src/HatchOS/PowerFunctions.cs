@@ -1,6 +1,8 @@
 ﻿/* DIRECTIVES */
 using Cosmos.HAL;
 using Cosmos.System;
+using PrismAPI.Graphics;
+using PrismAPI.Hardware.GPU;
 using System.Collections.Generic;
 using static HatchOS.HelperFunctions;
 
@@ -14,77 +16,77 @@ namespace HatchOS
         public static List<string> PowerOptions = new List<string> { "-s", "-r", "-a" };
         public static bool UsingCustomPowerMenu, AllowEscapeKey = true;
         public static string CustomTitle, CustomMessage;
-        public static PrismGraphics.Color CustomTitleColor, CustomMessageColor;
+        public static Color CustomTitleColor, CustomMessageColor;
 
         /* FUNCTIONS */
         // Draw the power menu and the selected option
-        public static void DrawPowerMenu(PrismGraphics.Extentions.Display canvas, int Option)
+        public static void DrawPowerMenu(Display canvas, int Option)
         {
             canvas.DrawImage(0, 0, Kernel.PowerGradientBG, false);
-            canvas.DrawString(0, 0, "[== CHOOSE A POWER OPTION ==]", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
-            canvas.DrawString(0, Kernel.ScreenHeight - 16, "Press ESCAPE to return to the desktop", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+            canvas.DrawString(0, 0, "[== CHOOSE A POWER OPTION ==]", default, Color.White);
+            canvas.DrawString(0, Kernel.ScreenHeight - 16, "Press ESCAPE to return to the desktop", default, Color.White);
 
             if (Option == 0)
             {
-                canvas.DrawFilledRectangle(0, 16, 128, 16, 0, PrismGraphics.Color.White);
-                canvas.DrawString(0, 16, "1. Shut down", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
-                canvas.DrawString(0, 32, "2. Reboot", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
-                canvas.DrawString(0, 48, "3. ACPI", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+                canvas.DrawFilledRectangle(0, 16, 128, 16, 0, Color.White);
+                canvas.DrawString(0, 16, "1. Shut down", default, Color.Black);
+                canvas.DrawString(0, 32, "2. Reboot", default, Color.White);
+                canvas.DrawString(0, 48, "3. ACPI", default, Color.White);
             }
 
             else if (Option == 1)
             {
-                canvas.DrawFilledRectangle(0, 32, 128, 16, 0, PrismGraphics.Color.White);
-                canvas.DrawString(0, 16, "1. Shut down", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
-                canvas.DrawString(0, 32, "2. Reboot", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
-                canvas.DrawString(0, 48, "3. ACPI", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+                canvas.DrawFilledRectangle(0, 32, 128, 16, 0, Color.White);
+                canvas.DrawString(0, 16, "1. Shut down", default, Color.White);
+                canvas.DrawString(0, 32, "2. Reboot", default, Color.Black);
+                canvas.DrawString(0, 48, "3. ACPI", default, Color.White);
             }
             else
             {
-                canvas.DrawFilledRectangle(0, 48, 128, 16, 0, PrismGraphics.Color.White);
-                canvas.DrawString(0, 16, "1. Shut down", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
-                canvas.DrawString(0, 32, "2. Reboot", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
-                canvas.DrawString(0, 48, "3. ACPI", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
+                canvas.DrawFilledRectangle(0, 48, 128, 16, 0, Color.White);
+                canvas.DrawString(0, 16, "1. Shut down", default, Color.White);
+                canvas.DrawString(0, 32, "2. Reboot", default, Color.White);
+                canvas.DrawString(0, 48, "3. ACPI", default, Color.Black);
             }
 
             canvas.Update();
         }
 
         // Draw a custom power menu and the selected option
-        public static void DrawCustomPowerMenu(PrismGraphics.Extentions.Display canvas, int Option, string Title, string Message, PrismGraphics.Color TitleColor, PrismGraphics.Color MessageColor)
+        public static void DrawCustomPowerMenu(Display canvas, int Option, string Title, string Message, Color TitleColor, Color MessageColor)
         {
             canvas.DrawImage(0, 0, Kernel.PowerGradientBG, false);
-            canvas.DrawString(0, 0, Title, PrismGraphics.Fonts.Font.Fallback, TitleColor);
-            canvas.DrawString(0, Kernel.ScreenHeight - 16, Message, PrismGraphics.Fonts.Font.Fallback, MessageColor);
+            canvas.DrawString(0, 0, Title, default, TitleColor);
+            canvas.DrawString(0, Kernel.ScreenHeight - 16, Message, default, MessageColor);
 
             if (Option == 0)
             {
-                canvas.DrawFilledRectangle(0, 16, 128, 16, 0, PrismGraphics.Color.White);
-                canvas.DrawString(0, 16, "1. Shut down", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
-                canvas.DrawString(0, 32, "2. Reboot", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
-                canvas.DrawString(0, 48, "3. ACPI", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+                canvas.DrawFilledRectangle(0, 16, 128, 16, 0, Color.White);
+                canvas.DrawString(0, 16, "1. Shut down", default, Color.Black);
+                canvas.DrawString(0, 32, "2. Reboot", default, Color.White);
+                canvas.DrawString(0, 48, "3. ACPI", default, Color.White);
             }
 
             else if (Option == 1)
             {
-                canvas.DrawFilledRectangle(0, 32, 128, 16, 0, PrismGraphics.Color.White);
-                canvas.DrawString(0, 16, "1. Shut down", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
-                canvas.DrawString(0, 32, "2. Reboot", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
-                canvas.DrawString(0, 48, "3. ACPI", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+                canvas.DrawFilledRectangle(0, 32, 128, 16, 0, Color.White);
+                canvas.DrawString(0, 16, "1. Shut down", default, Color.White);
+                canvas.DrawString(0, 32, "2. Reboot", default, Color.Black);
+                canvas.DrawString(0, 48, "3. ACPI", default, Color.White);
             }
             else
             {
-                canvas.DrawFilledRectangle(0, 48, 128, 16, 0, PrismGraphics.Color.White);
-                canvas.DrawString(0, 16, "1. Shut down", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
-                canvas.DrawString(0, 32, "2. Reboot", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
-                canvas.DrawString(0, 48, "3. ACPI", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.Black);
+                canvas.DrawFilledRectangle(0, 48, 128, 16, 0, Color.White);
+                canvas.DrawString(0, 16, "1. Shut down", default, Color.White);
+                canvas.DrawString(0, 32, "2. Reboot", default, Color.White);
+                canvas.DrawString(0, 48, "3. ACPI", default, Color.Black);
             }
 
             canvas.Update();
         }
 
         // Show the power menu and let the user make a selection
-        public static void PowerOff(PrismGraphics.Extentions.Display canvas, string mode)
+        public static void PowerOff(Display canvas, string mode)
         {
             // Display the power menu
             if(mode == "-sr")
@@ -156,10 +158,10 @@ namespace HatchOS
                     }
                     catch
                     {
-                        canvas.Clear(PrismGraphics.Color.Black);
+                        canvas.Clear(Color.Black);
                         canvas.DrawImage(0, 0, Kernel.PowerGradientBG);
                         canvas.DrawImage((int)(800 / 2 - Kernel.OSLogo.Width / 2), (int)(Kernel.ScreenHeight / 2 - (Kernel.OSLogo.Height / 2)), Kernel.OSLogo);
-                        canvas.DrawString(Kernel.ScreenHeight / 2 - ((27 * 8) / 2), (Kernel.ScreenHeight - 2) + 20, "HatchOS is shutting down...", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+                        canvas.DrawString(Kernel.ScreenHeight / 2 - ((27 * 8) / 2), (Kernel.ScreenHeight - 2) + 20, "HatchOS is shutting down...", default, Color.White);
                         canvas.Update();
                         var Timer = new PIT.PITTimer(Shutdown, SecondsToNanoseconds(1), true);
                         Cosmos.HAL.Global.PIT.RegisterTimer(Timer);
@@ -171,10 +173,10 @@ namespace HatchOS
             // Restart the computer
             else if (mode == "-r")
             {
-                canvas.Clear(PrismGraphics.Color.Black);
+                canvas.Clear(Color.Black);
                 canvas.DrawImage(0, 0, Kernel.PowerGradientBG);
                 canvas.DrawImage((int)(Kernel.ScreenWidth / 2 - Kernel.OSLogo.Width / 2), (int)(Kernel.ScreenHeight / 2 - (Kernel.OSLogo.Height / 2)), Kernel.OSLogo);
-                canvas.DrawString(Kernel.ScreenWidth / 2 - ((24 * 8) / 2), (Kernel.ScreenHeight / 2) + 20, "HatchOS is restarting...", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+                canvas.DrawString(Kernel.ScreenWidth / 2 - ((24 * 8) / 2), (Kernel.ScreenHeight / 2) + 20, "HatchOS is restarting...", default, Color.White);
                 canvas.Update();
                 PlayAudioFromMemory(Kernel.ShutdownAudio, Kernel.AudioVolume, true);
                 var Timer = new PIT.PITTimer(Restart, MillisecondsToNanoseconds(250), true);
@@ -185,10 +187,10 @@ namespace HatchOS
             // Restart the computer using ACPI
             else if (mode == "-a")
             {
-                canvas.Clear(PrismGraphics.Color.Black);
+                canvas.Clear(Color.Black);
                 canvas.DrawImage(0, 0, Kernel.PowerGradientBG);
                 canvas.DrawImage((int)(Kernel.ScreenWidth / 2 - Kernel.OSLogo.Width / 2), (int)(Kernel.ScreenHeight / 2 - (Kernel.OSLogo.Height / 2)), Kernel.OSLogo);
-                canvas.DrawString(Kernel.ScreenWidth / 2 - ((31 * 8) / 2), (Kernel.ScreenHeight / 2) + 20, "HatchOS is restarting (ACPI)...", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+                canvas.DrawString(Kernel.ScreenWidth / 2 - ((31 * 8) / 2), (Kernel.ScreenHeight / 2) + 20, "HatchOS is restarting (ACPI)...", default, Color.White);
                 canvas.Update();
                 PlayAudioFromMemory(Kernel.ShutdownAudio, Kernel.AudioVolume, true);
                 var Timer = new PIT.PITTimer(RebootACPI, MillisecondsToNanoseconds(250), true);
@@ -200,10 +202,10 @@ namespace HatchOS
             // Turn off the computer
             else if (mode == "-s")
             {
-                canvas.Clear(PrismGraphics.Color.Black);
+                canvas.Clear(Color.Black);
                 canvas.DrawImage(0, 0, Kernel.PowerGradientBG);
                 canvas.DrawImage((int)(Kernel.ScreenWidth / 2 - Kernel.OSLogo.Width / 2), (int)(Kernel.ScreenHeight / 2 - (Kernel.OSLogo.Height / 2)), Kernel.OSLogo);
-                canvas.DrawString(Kernel.ScreenWidth / 2 - ((27 * 8) / 2), (Kernel.ScreenHeight / 2) + 20, "HatchOS is shutting down...", PrismGraphics.Fonts.Font.Fallback, PrismGraphics.Color.White);
+                canvas.DrawString(Kernel.ScreenWidth / 2 - ((27 * 8) / 2), (Kernel.ScreenHeight / 2) + 20, "HatchOS is shutting down...", default, Color.White);
                 canvas.Update();
                 PlayAudioFromMemory(Kernel.ShutdownAudio, Kernel.AudioVolume, true);
                 var Timer = new PIT.PITTimer(Shutdown, MillisecondsToNanoseconds(250), true);
