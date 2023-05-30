@@ -1,3 +1,5 @@
 # HatchOS Media
 Graphical user interface (GUI): 
-![A screenshot of the HatchOS GUI.](https://www.github.com/memescoep/HatchOS/tree/main/media/GUI.png)
+<br/>
+
+![A screenshot of the HatchOS GUI.](https://github.com/MEMESCOEP/HatchOS/blob/main/media/GUI.png)
