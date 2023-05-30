@@ -1,5 +1,5 @@
 # HatchOS
-HatchOS is an experimental, [Cosmos](https://www.github.com/CosmosOS/Cosmos) based operating system designed for x86_64 computers. If you would like to see what HatchOS looks like, click [here](https://www.github.com/memescoep/media/media.md).
+HatchOS is an experimental, [Cosmos](https://www.github.com/CosmosOS/Cosmos) based operating system designed for x86_64 computers. If you would like to see what HatchOS looks like, click [here](https://www.github.com/memescoep/HatchOS/media/media.md).
 <br/>
 The following resources have been used during development:
 * [Cosmos OS development Kit](https://www.github.com/CosmosOS/Cosmos)
