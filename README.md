@@ -16,8 +16,8 @@ Here is a list of features that are currently implemented:
 
 ## Resources used
 The following resources have been used during development:
-* [Cosmos OS development Kit](https://www.github.com/CosmosOS/Cosmos)
-* [PrismAPI](https://github.com/Project-Prism/Prism-OS/tree/main/PrismAPI)
+* [Cosmos OS development Kit (Ver. DEVKIT)](https://www.github.com/CosmosOS/Cosmos)
+* [PrismAPI (Ver. 1.1)](https://github.com/Project-Prism/Prism-OS/tree/main/PrismAPI)
 <hr/>
 <br/>
 
