@@ -7,9 +7,9 @@ HatchOS is an experimental, [Cosmos](https://www.github.com/CosmosOS/Cosmos) bas
 Here is a list of features that are currently implemented:
 * Basic GUI
 * Basic serial console
-* Extremely basic window manager
-* Power functionality (Shutdown, Reboot, WIP  ACPI)
-* Demo 3D Rasterizer (PrismAPI; Currently broken due to funky cosmos things)
+* Basic window manager
+* Power functionality (Shutdown, Reboot, WIP ACPI)
+* Demo 3D Rasterizer (Implemented in PrismAPI; Currently broken due to funky cosmos things)
 * [WIP] AC97 Audio system and driver
 <hr/>
 <br/>
