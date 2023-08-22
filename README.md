@@ -1,3 +1,4 @@
+# [ I have stopped working on this project! ]
 # HatchOS
 HatchOS is an experimental, [Cosmos](https://www.github.com/CosmosOS/Cosmos) based operating system designed for x86_64 computers.
 <hr/>
